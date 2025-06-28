@@ -31,15 +31,17 @@ struct ContentView: View {
     var body: some View {
         VStack(spacing: 12){
             Image(systemName: "heart.fill")
-                .imageScale(.large)
+                .resizable()
+                .scaledToFit()
+                .foregroundStyle(.mint)
                 .foregroundStyle(.pink)
-            Text("Hello, world!")
-            Text("Second change has been made!")
+           
+            Text("This is my heart image")
+                .font(.title2)
+                .italic()
+                .bold()
             
-            Button("Start") {
-                
-            }
-            .tint(.blue)
+            
         }
         .padding()
     }
