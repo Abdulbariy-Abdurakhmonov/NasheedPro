@@ -5,6 +5,26 @@
 //  Created by Abdulboriy on 27/06/25.
 //
 
+
+/*
+ Commit messages:
+NEW FEATURE:
+[Feature] Description of the new feature
+ 
+BUG IN PRODUCTION: something that is working in app but should be changed
+[Patch] Description of Patch
+ 
+BUG NOT IN PRODUCTION:
+[Bag] Description of Bag
+ 
+MUNDANE TASKS:
+[Clean] Description of changes
+ 
+RELEASE(Big change/Feature readey to publish)
+[Release] Description of Relese
+ 
+ */
+
 import SwiftUI
 
 struct ContentView: View {
