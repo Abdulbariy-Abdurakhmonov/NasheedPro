@@ -41,6 +41,8 @@ struct ContentView: View {
                 .italic()
                 .bold()
             
+            Text("This is to be stashed")
+            
             
         }
         .padding()
