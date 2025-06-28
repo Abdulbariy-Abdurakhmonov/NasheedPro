@@ -35,6 +35,11 @@ struct ContentView: View {
                 .foregroundStyle(.pink)
             Text("Hello, world!")
             Text("Second change has been made!")
+            
+            Button("Start") {
+                
+            }
+            .tint(.red)
         }
         .padding()
     }
