@@ -39,7 +39,7 @@ struct ContentView: View {
             Button("Start") {
                 
             }
-            .tint(.red)
+            .tint(.blue)
         }
         .padding()
     }
