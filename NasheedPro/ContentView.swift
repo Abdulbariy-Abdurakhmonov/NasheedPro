@@ -44,6 +44,7 @@ struct ContentView: View {
             Text("This is to be stashed")
             
             
+            Image(systemName: "house.fill")
         }
         .padding()
     }
