@@ -9,9 +9,15 @@ import SwiftUI
 
 @main
 struct NasheedProApp: App {
+    
+    @StateObject private var viewmodel = NasheedViewModel()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationStack {
+                MainView()
+            }
+            .environmentObject(viewmodel)
         }
     }
 }
