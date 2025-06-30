@@ -10,7 +10,8 @@ import SwiftUI
 struct OnlineView: View {
     
     @EnvironmentObject private var viewmodel: NasheedViewModel
-    @State var text: String = ""
+    @State private var showDetailView: Bool = false
+//    @State var selectedNasheed: NasheedModel? = nil
     
     var body: some View {
         ZStack {
@@ -19,13 +20,13 @@ struct OnlineView: View {
            listView
             
         }
-        .background(Color.red)
         .navigationTitle("All Nasheeds")
         .toolbarTitleDisplayMode(.inline)
         
     }
     
 }
+
 
 #Preview {
     NavigationStack {
@@ -43,6 +44,9 @@ extension OnlineView {
             List {
                 ForEach(viewmodel.nasheeds, id: \.nasheedName) { nasheed in
                     NasheedRowView(nasheed: nasheed)
+                        .onTapGesture {
+                            
+                        }
                         .padding(.trailing, 20)
                         .listRowBackground(Color.clear)
                 }
@@ -50,4 +54,5 @@ extension OnlineView {
             .listStyle(.plain)
         }
     }
+    
 }
