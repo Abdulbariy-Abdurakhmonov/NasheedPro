@@ -8,7 +8,8 @@
 import Foundation
 import SwiftUICore
 
-class NasheedModel {
+class NasheedModel: Identifiable {
+    let id: String = UUID().uuidString
     var reciter: String
     var nasheedName: String
     var picture: Image?

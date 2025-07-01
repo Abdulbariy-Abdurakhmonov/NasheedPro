@@ -11,7 +11,7 @@ struct OnlineView: View {
     
     @EnvironmentObject private var viewmodel: NasheedViewModel
     @State private var showDetailView: Bool = false
-//    @State var selectedNasheed: NasheedModel? = nil
+    @State var selectedNasheed: NasheedModel? = nil
     
     var body: some View {
         ZStack {
@@ -38,6 +38,7 @@ struct OnlineView: View {
 
 
 
+
 extension OnlineView {
     private var listView: some View {
         VStack {
@@ -45,13 +46,17 @@ extension OnlineView {
                 ForEach(viewmodel.nasheeds, id: \.nasheedName) { nasheed in
                     NasheedRowView(nasheed: nasheed)
                         .onTapGesture {
-                            
+                            selectedNasheed = nasheed
                         }
                         .padding(.trailing, 20)
                         .listRowBackground(Color.clear)
                 }
             }
             .listStyle(.plain)
+            
+        }
+        .fullScreenCover(item: $selectedNasheed) { nasheed in
+            PlayingDetailView(viewModel: _viewmodel, nasheed: nasheed)
         }
     }
     
