@@ -30,7 +30,7 @@ struct PlayingDetailView: View {
                     .font(.headline)
                     .foregroundColor(.secondary)
             }
-            .padding(.vertical, 25)
+            .padding(.vertical, 10)
             
             PlayControllerView(isPlaying: $isPlaying, nasheed: nasheed)
                 

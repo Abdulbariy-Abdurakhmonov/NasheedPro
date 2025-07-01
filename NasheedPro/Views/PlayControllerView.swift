@@ -8,90 +8,79 @@
 import SwiftUI
 
 struct PlayControllerView: View {
-
+    
     @Binding var isPlaying: Bool
     @State private var isRepeating: Bool = false
     @State private var isLiked: Bool = false
     
     @StateObject private var vm = PlayControllerViewModel()
     
-    
-    
     let nasheed: NasheedModel
-    
     
     var body: some View {
         VStack {
-            HStack {
-                VStack {
-                    
-                    // Custom part
-                    sliderView
-                    
-                    timeLabel
-                }
-                .frame(height: 28) // Keep layout consistent
-                .padding(.horizontal)
-                // End of Custom part
-            }
-            
+            sliderView
             upperButtons
-            
             lowerButtons
         }
     }
-
+    
 }
 
 
 #Preview {
     PlayControllerView(isPlaying: .constant(false), nasheed: dev.mockData)
-//        .preferredColorScheme(.dark)
+    //        .preferredColorScheme(.dark)
 }
 
 
-extension PlayControllerView {
-    
-   private var sliderView: some View {
-       GeometryReader { geometry in
-           let sliderWidth = geometry.size.width // Use full width
 
-           ZStack(alignment: .leading) {
-               // Custom Track
-               RoundedRectangle(cornerRadius: 2)
-                   .fill(Color.gray.opacity(0.3))
-                   .frame(height: 4)
-               
-               // Custom Progress Bar
-               RoundedRectangle(cornerRadius: 2)
-                   .fill(Color.red)
-                   .frame(width: (vm.progress / vm.totalDuration) * sliderWidth, height: 4)
-               
-               // Custom SF Symbol Thumb (Draggable)
-               Image(systemName: "circle.fill")
-                   .resizable()
-                   .frame(width: 14, height: 14) // Adjust thumb size
-                   .foregroundColor(.red)
-                   .offset(x: (vm.progress / vm.totalDuration) * sliderWidth - 7) // Fix thumb position
-                   .gesture(
-                       DragGesture(minimumDistance: 0)
-                           .onChanged { value in
-                               let newProgress = min(max(0, value.location.x / sliderWidth * vm.totalDuration), vm.totalDuration)
-                               vm.progress = newProgress
-                           }
-                   )
-           }
-           .contentShape(Rectangle()) // Make the entire area tappable
-           .onTapGesture { location in
-               let newProgress = min(max(0, location.x / sliderWidth * vm.totalDuration), vm.totalDuration)
-               vm.progress = newProgress
-           }//Zstack
-           
-       }
-       .frame(height: 20) // Ensure enough space for the thumb
-       
-       
-   }
+
+extension PlayControllerView {
+    private var sliderView: some View {
+        VStack {
+            GeometryReader { geometry in
+                let sliderWidth = geometry.size.width // Use full width
+                
+                ZStack(alignment: .leading) {
+                    // Custom Track
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(Color.gray.opacity(0.3))
+                        .frame(height: 4)
+                    
+                    // Custom Progress Bar
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(Color.red)
+                        .frame(width: (vm.progress / vm.totalDuration) * sliderWidth, height: 4)
+                    
+                    // Custom SF Symbol Thumb (Draggable)
+                    Image(systemName: "circle.fill")
+                        .resizable()
+                        .frame(width: 14, height: 14) // Adjust thumb size
+                        .foregroundColor(.red)
+                        .offset(x: (vm.progress / vm.totalDuration) * sliderWidth - 7) // Fix thumb position
+                        .gesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    let newProgress = min(max(0, value.location.x / sliderWidth * vm.totalDuration), vm.totalDuration)
+                                    vm.progress = newProgress
+                                }
+                        )
+                }
+                .contentShape(Rectangle()) // Make the entire area tappable
+                .onTapGesture { location in
+                    let newProgress = min(max(0, location.x / sliderWidth * vm.totalDuration), vm.totalDuration)
+                    vm.progress = newProgress
+                }//Zstack
+                
+            }
+            .frame(height: 20) // Ensure enough space for the thumb
+            timeLabel
+        }
+        .frame(height: 28)
+        .padding(.horizontal)
+    }
+    
     
     private var timeLabel: some View {
         HStack {
@@ -102,6 +91,7 @@ extension PlayControllerView {
         .font(.caption)
         .foregroundStyle(.primary)
     }
+    
     
     
     private var upperButtons: some View {
@@ -146,8 +136,7 @@ extension PlayControllerView {
             Button {
                 isRepeating.toggle()
             }label: { ControllButton(icon: isRepeating ? "moon.zzz" : "moon.zzz.fill", size: 28) }
-            
-            
+
             Spacer()
             
             Button {
@@ -161,7 +150,7 @@ extension PlayControllerView {
             } label: {
                 ControllButton(icon: isRepeating ? "repeat" : "repeat.1", size: 28)
             }
-        }//Final Hstack
+        }
         .padding(.horizontal, 55)
     }
     
