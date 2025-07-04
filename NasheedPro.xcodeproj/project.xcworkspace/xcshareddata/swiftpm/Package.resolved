@@ -1,0 +1,15 @@
+{
+  "originHash" : "2deb58cb75648642eeecc0ab3c1495bad4282b995ee29cef80bcca051a0b84c5",
+  "pins" : [
+    {
+      "identity" : "minimizableview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DominikButz/MinimizableView",
+      "state" : {
+        "revision" : "59c57674b9979b2b3552baf2edb513e4eec69a4a",
+        "version" : "2.4.2"
+      }
+    }
+  ],
+  "version" : 3
+}

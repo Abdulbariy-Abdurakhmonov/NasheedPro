@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
+import MinimizableView
 
 struct OnlineView: View {
     
     @EnvironmentObject private var viewmodel: NasheedViewModel
+    @EnvironmentObject var miniHandler: MinimizableViewHandler
     @State private var showDetailView: Bool = false
     @State var selectedNasheed: NasheedModel? = nil
+    
     
     var body: some View {
         ZStack {
@@ -34,6 +37,8 @@ struct OnlineView: View {
             .preferredColorScheme(.light)
     }
     .environmentObject(dev.nasheedVM)
+    .environmentObject(MinimizableViewHandler())
+    
 }
 
 
@@ -41,10 +46,13 @@ struct OnlineView: View {
 
 extension OnlineView {
     private var listView: some View {
-        VStack {
+        @Namespace var namespace
+        return VStack {
             List {
-                ForEach(viewmodel.nasheeds, id: \.nasheedName) { nasheed in
+                ForEach(viewmodel.nasheeds) { nasheed in
+                    
                     NasheedRowView(nasheed: nasheed)
+                    
                         .onTapGesture {
                             selectedNasheed = nasheed
                         }
@@ -52,11 +60,12 @@ extension OnlineView {
                         .listRowBackground(Color.clear)
                 }
             }
+
             .listStyle(.plain)
             
         }
         .fullScreenCover(item: $selectedNasheed) { nasheed in
-            PlayingDetailView(viewModel: _viewmodel, nasheed: nasheed)
+            PlayingDetailView(viewModel: _viewmodel, nasheed: nasheed, animationNamespaceId: namespace)
         }
     }
     

@@ -6,11 +6,13 @@
 //
 
 import SwiftUI
+import MinimizableView
 
 @main
 struct NasheedProApp: App {
     
     @StateObject private var viewmodel = NasheedViewModel()
+    @StateObject private var miniHandler = MinimizableViewHandler()
     
     var body: some Scene {
         WindowGroup {
@@ -18,6 +20,7 @@ struct NasheedProApp: App {
                 MainView()
             }
             .environmentObject(viewmodel)
+            .environmentObject(miniHandler)
         }
     }
 }
