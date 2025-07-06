@@ -11,9 +11,10 @@ import MinimizableView
 struct OnlineView: View {
     
     @EnvironmentObject private var viewmodel: NasheedViewModel
-    @EnvironmentObject var miniHandler: MinimizableViewHandler
+    @EnvironmentObject private var miniHandler: MinimizableViewHandler
     @State private var showDetailView: Bool = false
-    @State var selectedNasheed: NasheedModel? = nil
+    @Binding var selectedNasheed: NasheedModel?
+    @Namespace var namespace
     
     
     var body: some View {
@@ -28,12 +29,40 @@ struct OnlineView: View {
         
     }
     
+    private var listView: some View {
+        
+         VStack {
+            List {
+                ForEach(viewmodel.nasheeds) { nasheed in
+                    
+                    NasheedRowView(nasheed: nasheed)
+                    
+                        .onTapGesture {
+                            withAnimation(.spring){
+                                selectedNasheed = nasheed
+                                self.miniHandler.present()
+                            }
+                           
+                            
+                        }
+                        .padding(.trailing, 20)
+                        .listRowBackground(Color.clear)
+                }
+            }
+
+            .listStyle(.plain)
+            
+        }
+
+
+    }
+    
 }
 
 
 #Preview {
     NavigationStack {
-        OnlineView()
+        OnlineView(selectedNasheed: .constant(.none))
             .preferredColorScheme(.light)
     }
     .environmentObject(dev.nasheedVM)
@@ -44,29 +73,7 @@ struct OnlineView: View {
 
 
 
-extension OnlineView {
-    private var listView: some View {
-        @Namespace var namespace
-        return VStack {
-            List {
-                ForEach(viewmodel.nasheeds) { nasheed in
-                    
-                    NasheedRowView(nasheed: nasheed)
-                    
-                        .onTapGesture {
-                            selectedNasheed = nasheed
-                        }
-                        .padding(.trailing, 20)
-                        .listRowBackground(Color.clear)
-                }
-            }
 
-            .listStyle(.plain)
-            
-        }
-        .fullScreenCover(item: $selectedNasheed) { nasheed in
-            PlayingDetailView(viewModel: _viewmodel, nasheed: nasheed, animationNamespaceId: namespace)
-        }
-    }
     
-}
+    
+

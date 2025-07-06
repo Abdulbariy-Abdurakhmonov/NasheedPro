@@ -1,37 +1,28 @@
-///
-///  MainView.swift
-///  NasheedPro
-///
-/// Created by Abdulboriy on 29/06/25.
-
 
 
 import SwiftUI
 import MinimizableView
 
 struct MainView: View {
+    @EnvironmentObject var viewModel: NasheedViewModel
+    @EnvironmentObject var miniHandler: MinimizableViewHandler
     @Environment(\.colorScheme) var colorScheme
-    @StateObject var miniHandler = MinimizableViewHandler()
     @State var selectedTabIndex: Int = 0
     @State var miniViewBottomMargin: CGFloat = 0
     @GestureState var dragOffset = CGSize.zero
     @Namespace var namespace
+    @State var selectedNasheed: NasheedModel? = nil
+
     
     var body: some View {
                GeometryReader { proxy in
 
                        TabView(selection: self.$selectedTabIndex) {
-                           
-                           Button(action: {
-                               print(proxy.safeAreaInsets.bottom)
-                               self.miniHandler.present()
-                               
-                           }) { Text("Launch Minimizable View").foregroundStyle(.green).disabled(self.miniHandler.isPresented)}
                                    
-                               
+                           OnlineView(selectedNasheed: $selectedNasheed)
                                .tabItem {
-                                   Image(systemName: "chevron.up.square.fill")
-                                   Text("Main View")
+                                   Image(systemName: "headphones")
+                                   Text("Stream")
                            }.tag(0)
                            .background(TabBarAccessor { tabBar in        // add to update the minimizedBottomMargin dynamically!
                                    self.miniViewBottomMargin = tabBar.bounds.height - 1
@@ -39,20 +30,24 @@ struct MainView: View {
                            
                            Text("More stuff")
                                .tabItem {
-                               Image(systemName: "dot.square.fill")
-                               Text("2nd View")
+                               Image(systemName: "heart.fill")
+                               Text("Favourites")
                            }.tag(1)
                            
                            Text("3rd stuff")
                                .tabItem {
-                               Image(systemName: "square.split.2x1.fill")
-                               Text("List View")
+                               Image(systemName: "bookmark.fill")
+                               Text("Downloads")
                            }.tag(2)
                            
                            
                        }.background(Color(.secondarySystemFill))
                        .statusBar(hidden: self.miniHandler.isPresented && self.miniHandler.isMinimized == false)
-                       .minimizableView(content: {PlayingDetailView(nasheed: dev.mockData, animationNamespaceId: self.namespace)},
+                       .minimizableView(content: {
+                           if let nasheed = selectedNasheed {
+                               PlayingDetailView(nasheed: nasheed, animationNamespaceId: self.namespace)
+                           }
+                       },
                          compactView: {
                            EmptyView()
                            
@@ -69,7 +64,9 @@ struct MainView: View {
                            dragOnEnded: { (value) in
                            self.dragOnEnded(value: value)
                        }, minimizedBottomMargin: self.miniViewBottomMargin, settings: MiniSettings(minimizedHeight: 80))
+                   
                        .environmentObject(self.miniHandler)
+                       
             
                }
            
@@ -123,6 +120,9 @@ struct MainView: View {
 
 #Preview {
     NavigationStack {
-            MainView()
+        MainView()
         }
+    .environmentObject(dev.nasheedVM)
+    .environmentObject(MinimizableViewHandler())
+//    .preferredColorScheme(.dark)
 }

@@ -14,8 +14,7 @@ final class NasheedViewModel: ObservableObject {
     @Published var nasheeds: [NasheedModel] = []
     
     init() {
-//        self.nasheeds.append(NasheedModel(reciter: "Muhammad Tohir", nasheedName: "Xuz Dimana"))
-//        self.nasheeds.append(NasheedModel(reciter: "Ahmed Bukhatir", nasheedName: "Kun Musliman"))
+
         getData()
 
     }
