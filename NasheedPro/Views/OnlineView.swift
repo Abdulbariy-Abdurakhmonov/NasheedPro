@@ -40,7 +40,11 @@ struct OnlineView: View {
                         .onTapGesture {
                             withAnimation(.spring){
                                 selectedNasheed = nasheed
-                                self.miniHandler.present()
+                                if self.miniHandler.isPresented {
+                                    self.miniHandler.expand()
+                                } else {
+                                    self.miniHandler.present()
+                                }
                             }
                            
                             
