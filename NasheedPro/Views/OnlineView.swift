@@ -52,8 +52,10 @@ struct OnlineView: View {
                         .padding(.trailing, 20)
                         .listRowBackground(Color.clear)
                 }
+                .listSectionSeparator(.hidden, edges: .all)
+                
             }
-
+            .scrollIndicators(.hidden)
             .listStyle(.plain)
             
         }

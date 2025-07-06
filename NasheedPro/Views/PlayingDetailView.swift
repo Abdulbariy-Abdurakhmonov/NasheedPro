@@ -64,7 +64,6 @@ struct PlayingDetailView: View {
                 
                 Spacer()
                 
-                
                 HStack(spacing: 15){
                     
                     // makes the image centered if not minimized, but if minimized, it makes it leading age
@@ -74,50 +73,56 @@ struct PlayingDetailView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(width: self.imageSize(proxy: proxy), height: self.imageSize(proxy: proxy))
-                        .cornerRadius(15)
-                    
-                    
-                    
+                        .cornerRadius(30)
+
+
                     
                     //Mini view
-                    if miniHandler.isMinimized{
+                    if miniHandler.isMinimized {
                         VStack(alignment: .leading) {
                             Text(nasheed.nasheedName)
                                 .font(.title2)
-                                .fontWeight(.bold)
+                                .fontDesign(.serif)
                                 .fixedSize(horizontal: true, vertical: false)
                                 .matchedGeometryEffect(id: nasheed.nasheedName, in: animationNamespaceId)
                             
                             
                             Text(nasheed.reciter)
-                                .font(.title3)
-                                .fontWeight(.medium)
+                                .font(.subheadline)
+                                .fontDesign(.serif)
+                                .foregroundStyle(.secondary)
                                 .fixedSize(horizontal: true, vertical: false)
                                 .matchedGeometryEffect(id: nasheed.reciter, in: animationNamespaceId)
-                            
-                            
                         }
+                        
                         Spacer(minLength: 0)
                         self.minimizedControls
+                            
                     } else {
                         Spacer(minLength: 0)
                     }
                 }
                 .padding(.horizontal)
                 
+             
+                
                 if self.miniHandler.isMinimized == false {
-//                    self.expandedControls(safeInsets: proxy.safeAreaInsets)
                     VStack {
                         Text(nasheed.nasheedName)
-                            .font(.title2)
-                            .fontWeight(.bold)
+                            .font(.title)
+                            .fontDesign(.serif)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
                             .matchedGeometryEffect(id: nasheed.nasheedName, in: animationNamespaceId)
                             .fixedSize(horizontal: true, vertical: false)
                         
                         
                         Text(nasheed.reciter)
-                            .fontWeight(.medium)
-                            .font(.title3)
+                            .font(.title2)
+                            .fontDesign(.serif)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
                             .matchedGeometryEffect(id: nasheed.reciter, in: animationNamespaceId)
                             .fixedSize(horizontal: true, vertical: false)
                         
@@ -132,14 +137,33 @@ struct PlayingDetailView: View {
                 
                 
             }
-           
         }.transition(AnyTransition.move(edge: .bottom))
         
     } //Body
     
     
+//    var doubleText: some View {
+//        VStack(alignment: self.miniHandler.isMinimized ? .leading : .center) {
+//            Text(nasheed.nasheedName)
+//                .font(miniHandler.isMinimized ? .title2: .title)
+//                .fontDesign(.serif)
+//                .fixedSize(horizontal: true, vertical: false)
+//                .matchedGeometryEffect(id: nasheed.nasheedName, in: animationNamespaceId)
+//            
+//            
+//            Text(nasheed.reciter)
+//                .font(miniHandler.isMinimized ? .subheadline: .title2)
+//                .fontDesign(.serif)
+//                .foregroundStyle(.secondary)
+//                .fixedSize(horizontal: true, vertical: false)
+//                .matchedGeometryEffect(id: nasheed.reciter, in: animationNamespaceId)
+//            
+//        }
+//    }
+    
+    
     var minimizedControls: some View {
-        Group {
+        HStack(spacing: 16) {
             Button(action: {}, label: {
                 
                 Image(systemName: "play.fill")
@@ -154,6 +178,7 @@ struct PlayingDetailView: View {
                     .foregroundColor(.primary)
             })
         }
+        .padding(.trailing, 16)
     }
     
     // square shaped, so we only need the edge length
