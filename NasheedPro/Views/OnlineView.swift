@@ -15,6 +15,7 @@ struct OnlineView: View {
     @State private var showDetailView: Bool = false
     @Binding var selectedNasheed: NasheedModel?
     @Namespace var namespace
+    @State private var searchText: String = ""
     
     
     var body: some View {
@@ -24,8 +25,10 @@ struct OnlineView: View {
            listView
             
         }
+        .searchable(text: $searchText, prompt: "Find Nasheed...")
         .navigationTitle("All Nasheeds")
         .toolbarTitleDisplayMode(.inline)
+  
         
     }
     
