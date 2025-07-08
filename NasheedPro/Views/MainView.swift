@@ -6,10 +6,9 @@ import MinimizableView
 struct MainView: View {
     @EnvironmentObject var viewModel: NasheedViewModel
     @EnvironmentObject var miniHandler: MinimizableViewHandler
-    @State var miniViewBottomMargin: CGFloat = 0
     @Namespace var namespace
+    @State var miniViewBottomMargin: CGFloat = 0
     @State var selectedNasheed: NasheedModel? = nil
-    
     @StateObject private var miniVM: MiniViewModel
 
         init() {
@@ -17,17 +16,39 @@ struct MainView: View {
     
     
     var body: some View {
-        
+        tabViews
+        .onAppear {
+            miniVM.setHandler(miniHandler)
+        }
+    }
+}
+
+
+
+#Preview {
+    NavigationStack {
+        MainView()
+    }
+    .environmentObject(dev.nasheedVM)
+    .environmentObject(MinimizableViewHandler())
+//    .preferredColorScheme(.dark)
+}
+
+
+
+
+
+extension MainView {
+    private var tabViews: some View {
         TabView {
             NavigationView {
                 OnlineView(selectedNasheed: $selectedNasheed)
-                
             }
             .tabItem {
                 Image(systemName: "headphones")
                 Text("Stream")
             }.tag(0)
-                .background(TabBarAccessor { tabBar in 
+                .background(TabBarAccessor { tabBar in
                     self.miniViewBottomMargin = tabBar.bounds.height - 1
                 })
             
@@ -49,30 +70,10 @@ struct MainView: View {
         }
         .modifier(miniPlayerModifier())
         .environmentObject(self.miniHandler)
-        .onAppear {
-            miniVM.setHandler(miniHandler)
-        }
-        
     }
     
-}
-
-
-
-#Preview {
-    NavigationStack {
-        MainView()
-    }
-    .environmentObject(dev.nasheedVM)
-    .environmentObject(MinimizableViewHandler())
-//    .preferredColorScheme(.dark)
-}
-
-
-
-
-
-extension MainView {
+    
+    
     func miniPlayerModifier() -> some ViewModifier {
         MiniPlayerModifier(
             namespace: self.namespace,
@@ -91,5 +92,7 @@ extension MainView {
             dragEnded: { value in miniVM.dragOnEnded(value: value) }
         )
     }
+    
+    
 }
 
