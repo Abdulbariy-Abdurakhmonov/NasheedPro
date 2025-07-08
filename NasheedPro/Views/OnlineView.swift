@@ -25,18 +25,49 @@ struct OnlineView: View {
            listView
             
         }
-        .searchable(text: $viewModel.searchText, prompt: "Find Nasheed...")
-        .navigationTitle("All Nasheeds")
-        .toolbarTitleDisplayMode(.inline)
+        .toolbar {
+            searchToolBar
+        }
+        
+    }
+}
+
+
+
+#Preview {
+    NavigationStack {
+        OnlineView(selectedNasheed: .constant(.none))
+            .preferredColorScheme(.light)
+    }
+    .environmentObject(dev.nasheedVM)
+    .environmentObject(MinimizableViewHandler())
+}
+
+
+
+
+extension OnlineView {
+    
+    private var searchToolBar: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            Menu {
+                Button("Search by Reciter Name") {
+                    viewModel.searchMode = .reciter }
+                Button("Search by Nasheed Name") {
+                    viewModel.searchMode = .nasheed }
+            } label: {
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                    Text(viewModel.searchMode == .reciter ? "Reciter" : "Nasheed")
+                }
+                .font(.subheadline)
+            }
+        }
     }
     
     
-    
-    
-    
     private var listView: some View {
-        
-         VStack {
+        VStack {
             List {
                 ForEach(viewModel.filteredNasheeds) { nasheed in
                     
@@ -64,26 +95,14 @@ struct OnlineView: View {
             .listStyle(.plain)
             
         }
-
+         .searchable(text: $viewModel.searchText,
+                     prompt: viewModel.searchMode ==
+            .reciter ? "Search a reciter..." :  "Search a nasheed...")
+         .navigationTitle("All Nasheeds")
+         .toolbarTitleDisplayMode(.inline)
 
     }
-    
 }
-
-
-#Preview {
-    NavigationStack {
-        OnlineView(selectedNasheed: .constant(.none))
-            .preferredColorScheme(.light)
-    }
-    .environmentObject(dev.nasheedVM)
-    .environmentObject(MinimizableViewHandler())
-    
-}
-
-
-
-
 
     
     
