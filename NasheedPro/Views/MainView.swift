@@ -6,11 +6,15 @@ import MinimizableView
 struct MainView: View {
     @EnvironmentObject var viewModel: NasheedViewModel
     @EnvironmentObject var miniHandler: MinimizableViewHandler
-    @Environment(\.colorScheme) var colorScheme
     @State var miniViewBottomMargin: CGFloat = 0
     @GestureState var dragOffset = CGSize.zero
     @Namespace var namespace
     @State var selectedNasheed: NasheedModel? = nil
+    
+    @StateObject private var miniVM: MiniViewModel
+
+        init() {
+            _miniVM = StateObject(wrappedValue: MiniViewModel(miniHandler: MinimizableViewHandler(), colorScheme: .light))}
     
     
     var body: some View {
@@ -43,8 +47,6 @@ struct MainView: View {
                 Image(systemName: "bookmark.fill")
                 Text("Downloads")
             }.tag(2)
-            
-            
         }
         
         .background(Color(.secondarySystemFill))
@@ -58,67 +60,28 @@ struct MainView: View {
             EmptyView()
             
         }, backgroundView: {
-            self.backgroundView()},
+            miniVM.backgroundView()},
                          dragOffset: $dragOffset,
                          dragUpdating: { (value, state, transaction) in
             state = value.translation
-            self.dragUpdated(value: value)
+            miniVM.dragUpdated(value: value)
             
         }, dragOnChanged: { (value) in
             // add some custom logic if needed
         },
                          dragOnEnded: { (value) in
-            self.dragOnEnded(value: value)
+            miniVM.dragOnEnded(value: value)
         }, minimizedBottomMargin: self.miniViewBottomMargin, settings: MiniSettings(minimizedHeight: 80))
         
         .environmentObject(self.miniHandler)
-        
-    }
-    
-    
-    func backgroundView() -> some View {
-        VStack(spacing: 0){
-            Color.init(uiColor: .systemBackground)
-            if self.miniHandler.isMinimized {
-                Divider()
-            }
-        }.cornerRadius(self.miniHandler.isMinimized ? 0 : 20)
-            .shadow(color: .gray.opacity(self.colorScheme == .light ? 0.18 : 0), radius: 5, x: 0, y: -5)
-            .onTapGesture(perform: {
-                if self.miniHandler.isMinimized {
-                    self.miniHandler.expand()
-                    //alternatively, override the default animation. self.miniHandler.expand(animation: Animation)
-                }
-            })
-    }
-    
-    
-    func dragUpdated(value: DragGesture.Value) {
-        
-        if self.miniHandler.isMinimized == false && value.translation.height > 0   { // expanded state
-            
-            self.miniHandler.draggedOffsetY = value.translation.height  // divide by a factor > 1 for more "inertia" if needed
-            
-        } else if self.miniHandler.isMinimized && value.translation.height < 0   {// minimized state
-            self.miniHandler.draggedOffsetY = value.translation.height  // divide by a factor > 1 for more "inertia" if needed
-            
-        }
-    }
-    
-    func dragOnEnded(value: DragGesture.Value) {
-        
-        if self.miniHandler.isMinimized == false && value.translation.height > 90  {
-            self.miniHandler.minimize()
-            
-        } else if self.miniHandler.isMinimized &&  value.translation.height < -60 {
-            self.miniHandler.expand()
-        }
-        withAnimation(.spring()) {
-            self.miniHandler.draggedOffsetY = 0
+        .onAppear {
+            miniVM.setHandler(miniHandler)
         }
         
     }
+    
 }
+
 
 
 #Preview {
@@ -127,5 +90,5 @@ struct MainView: View {
     }
     .environmentObject(dev.nasheedVM)
     .environmentObject(MinimizableViewHandler())
-    //    .preferredColorScheme(.dark)
+//    .preferredColorScheme(.dark)
 }
