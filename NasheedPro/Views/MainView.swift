@@ -7,7 +7,6 @@ struct MainView: View {
     @EnvironmentObject var viewModel: NasheedViewModel
     @EnvironmentObject var miniHandler: MinimizableViewHandler
     @State var miniViewBottomMargin: CGFloat = 0
-    @GestureState var dragOffset = CGSize.zero
     @Namespace var namespace
     @State var selectedNasheed: NasheedModel? = nil
     
@@ -48,31 +47,7 @@ struct MainView: View {
                 Text("Downloads")
             }.tag(2)
         }
-        
-        .background(Color(.secondarySystemFill))
-        .statusBar(hidden: self.miniHandler.isPresented && self.miniHandler.isMinimized == false)
-        .minimizableView(content: {
-            if let nasheed = selectedNasheed {
-                PlayingDetailView(nasheed: nasheed, animationNamespaceId: self.namespace)
-            }
-        },
-                         compactView: {
-            EmptyView()
-            
-        }, backgroundView: {
-            miniVM.backgroundView()},
-                         dragOffset: $dragOffset,
-                         dragUpdating: { (value, state, transaction) in
-            state = value.translation
-            miniVM.dragUpdated(value: value)
-            
-        }, dragOnChanged: { (value) in
-            // add some custom logic if needed
-        },
-                         dragOnEnded: { (value) in
-            miniVM.dragOnEnded(value: value)
-        }, minimizedBottomMargin: self.miniViewBottomMargin, settings: MiniSettings(minimizedHeight: 80))
-        
+        .modifier(miniPlayerModifier())
         .environmentObject(self.miniHandler)
         .onAppear {
             miniVM.setHandler(miniHandler)
@@ -92,3 +67,29 @@ struct MainView: View {
     .environmentObject(MinimizableViewHandler())
 //    .preferredColorScheme(.dark)
 }
+
+
+
+
+
+extension MainView {
+    func miniPlayerModifier() -> some ViewModifier {
+        MiniPlayerModifier(
+            namespace: self.namespace,
+            miniHandler: self.miniHandler,
+            miniViewBottomMargin: self.miniViewBottomMargin,
+            content: {
+                if let nasheed = self.selectedNasheed {
+                    return AnyView(PlayingDetailView(nasheed: nasheed, animationNamespaceId: self.namespace))
+                } else {
+                    return AnyView(EmptyView())
+                }
+            },
+            compactView: { AnyView(EmptyView()) },
+            backgroundView: { AnyView(miniVM.backgroundView()) },
+            dragUpdated: { value in miniVM.dragUpdated(value: value) },
+            dragEnded: { value in miniVM.dragOnEnded(value: value) }
+        )
+    }
+}
+

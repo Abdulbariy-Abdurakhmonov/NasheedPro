@@ -20,6 +20,7 @@ struct MiniPlayerModifier: ViewModifier {
     let dragUpdated: (DragGesture.Value) -> Void
     let dragEnded: (DragGesture.Value) -> Void
     
+    
 
     func body(content view: Content) -> some View {
         view
@@ -45,6 +46,7 @@ struct MiniPlayerModifier: ViewModifier {
             .environmentObject(miniHandler)
     }
 }
+
 
 
 extension View {
