@@ -10,12 +10,12 @@ import MinimizableView
 
 struct OnlineView: View {
     
-    @EnvironmentObject private var viewmodel: NasheedViewModel
+    @EnvironmentObject private var viewModel: NasheedViewModel
     @EnvironmentObject private var miniHandler: MinimizableViewHandler
     @State private var showDetailView: Bool = false
     @Binding var selectedNasheed: NasheedModel?
     @Namespace var namespace
-    @State private var searchText: String = ""
+
     
     
     var body: some View {
@@ -25,18 +25,20 @@ struct OnlineView: View {
            listView
             
         }
-        .searchable(text: $searchText, prompt: "Find Nasheed...")
+        .searchable(text: $viewModel.searchText, prompt: "Find Nasheed...")
         .navigationTitle("All Nasheeds")
         .toolbarTitleDisplayMode(.inline)
-  
-        
     }
+    
+    
+    
+    
     
     private var listView: some View {
         
          VStack {
             List {
-                ForEach(viewmodel.nasheeds) { nasheed in
+                ForEach(viewModel.filteredNasheeds) { nasheed in
                     
                     NasheedRowView(nasheed: nasheed)
                     

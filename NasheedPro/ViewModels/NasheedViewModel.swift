@@ -12,6 +12,25 @@ import SwiftUI
 final class NasheedViewModel: ObservableObject {
     
     @Published var nasheeds: [NasheedModel] = []
+    @Published var searchMode: SearchMode = .nasheed
+    @Published var searchText: String = ""
+    
+    enum SearchMode {
+        case reciter
+        case nasheed
+    }
+    
+    var filteredNasheeds: [NasheedModel] {
+        if searchText.isEmpty {
+            return nasheeds
+        } else {
+            return nasheeds.filter {
+                searchMode == .nasheed ? $0.nasheedName.localizedCaseInsensitiveContains(searchText)
+                : $0.reciter.localizedCaseInsensitiveContains(searchText)
+            }
+        }
+    }
+    
     
     init() {
 
