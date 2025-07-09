@@ -14,8 +14,8 @@ struct NasheedRowView: View {
     
     var body: some View {
         HStack {
-            Image("nasheedImage")
-                .resizable()
+//            Image("nasheedImage")
+            ImageLoader(url: "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg")
                 .frame(width: 46, height: 46)
                 .cornerRadius(36)
                 .padding(.trailing, 10)
