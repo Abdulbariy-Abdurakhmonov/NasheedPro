@@ -13,7 +13,6 @@ struct PlayingDetailView: View {
     @EnvironmentObject var viewModel: NasheedViewModel
     
     @State var isPlaying: Bool = false
-    @State private var volume : Double = 0
     
     var nasheed: NasheedModel
     var animationNamespaceId: Namespace.ID
@@ -88,6 +87,7 @@ struct PlayingDetailView: View {
                                 .matchedGeometryEffect(id: nasheed.nasheed, in: animationNamespaceId)
                             
                             
+                            
                             Text(nasheed.reciter)
                                 .font(.subheadline)
                                 .fontDesign(.serif)
@@ -97,7 +97,8 @@ struct PlayingDetailView: View {
                         }
                         
                         Spacer(minLength: 0)
-                        self.minimizedControls
+
+                        MinimizedController(nasheed: nasheed, player: AudioPlayerManager.shared)
                             
                     } else {
                         Spacer(minLength: 0)
@@ -143,24 +144,6 @@ struct PlayingDetailView: View {
     } //Body
     
         
-    var minimizedControls: some View {
-        HStack(spacing: 16) {
-            Button(action: {}, label: {
-                
-                Image(systemName: "play.fill")
-                    .font(.title2)
-                    .foregroundColor(.primary)
-            })
-            
-            Button(action: {}, label: {
-                
-                Image(systemName: "forward.fill")
-                    .font(.title2)
-                    .foregroundColor(.primary)
-            })
-        }
-        .padding(.trailing, 16)
-    }
     
     // square shaped, so we only need the edge length
     func imageSize(proxy: GeometryProxy)->CGFloat {

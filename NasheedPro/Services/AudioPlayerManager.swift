@@ -20,6 +20,7 @@ class AudioPlayerManager: ObservableObject {
     static let shared = AudioPlayerManager()
     
     private var player: AVPlayer?
+    
     @Published var isPlaying = false
     
     func play(url: URL) {

@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+
+
 struct PlayControllerView: View {
     
     @Binding var isPlaying: Bool
@@ -131,7 +133,7 @@ extension PlayControllerView {
             }
             
             Button {
-//                vm.togglePlayback()
+                
                 guard let url = URL(string: nasheed.audio) else { return }
                 player.togglePlayPause(url: url)
                 
