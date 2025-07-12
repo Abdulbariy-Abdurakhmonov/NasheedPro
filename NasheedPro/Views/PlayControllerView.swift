@@ -12,8 +12,14 @@ struct PlayControllerView: View {
     @Binding var isPlaying: Bool
     @State private var isRepeating: Bool = false
     @State private var isLiked: Bool = false
+
+    @StateObject var player = AudioPlayerManager.shared
     
-    @StateObject private var vm = PlayControllerViewModel()
+    let haptic = HapticManager.shared
+
+    
+    
+
     
     let nasheed: NasheedModel
     
@@ -37,6 +43,7 @@ struct PlayControllerView: View {
 
 
 extension PlayControllerView {
+    
     private var sliderView: some View {
         VStack {
             GeometryReader { geometry in
@@ -48,29 +55,45 @@ extension PlayControllerView {
                         .fill(Color.gray.opacity(0.3))
                         .frame(height: 4)
                     
+                    
+                    let currentProgress = player.previewProgress ?? player.progress
+                    let progressRatio = currentProgress / player.totalDuration
+
                     // Custom Progress Bar
                     RoundedRectangle(cornerRadius: 2)
                         .fill(Color.red)
-                        .frame(width: (vm.progress / vm.totalDuration) * sliderWidth, height: 4)
+                        .frame(width: sliderWidth * progressRatio, height: 4)
+                    
+       
                     
                     // Custom SF Symbol Thumb (Draggable)
                     Image(systemName: "circle.fill")
                         .resizable()
                         .frame(width: 14, height: 14) // Adjust thumb size
                         .foregroundColor(.red)
-                        .offset(x: (vm.progress / vm.totalDuration) * sliderWidth - 7) // Fix thumb position
+                        .offset(x: progressRatio * sliderWidth - 7 )
                         .gesture(
                             DragGesture(minimumDistance: 0)
                                 .onChanged { value in
-                                    let newProgress = min(max(0, value.location.x / sliderWidth * vm.totalDuration), vm.totalDuration)
-                                    vm.progress = newProgress
+                                    let newProgress = min(max(0, value.location.x / sliderWidth * player.totalDuration), player.totalDuration)
+                                    
+                                    player.previewProgress = newProgress
+                                    haptic.playImpact()
                                 }
+                                .onEnded { value in
+                                        let newProgress = min(max(0, value.location.x / sliderWidth * player.totalDuration), player.totalDuration)
+                                        player.seek(to: newProgress) // updates actual audio position
+                                    player.previewProgress = nil
+                                    haptic.playSelection()
+                                    
+                                    }
                         )
                 }
                 .contentShape(Rectangle()) // Make the entire area tappable
                 .onTapGesture { location in
-                    let newProgress = min(max(0, location.x / sliderWidth * vm.totalDuration), vm.totalDuration)
-                    vm.progress = newProgress
+                    let newProgress = min(max(0, location.x / sliderWidth * player.totalDuration), player.totalDuration)
+                    player.seek(to: newProgress)
+                    haptic.playSelection()
                 }//Zstack
                 
             }
@@ -81,18 +104,16 @@ extension PlayControllerView {
         .padding(.horizontal)
     }
     
-    
+        
     private var timeLabel: some View {
         HStack {
-            Text(vm.formatTime(vm.progress))  // Current time
+            Text(player.formatTime(player.previewProgress ?? player.progress))  // Current time
             Spacer()
-            Text(vm.formatTime(vm.totalDuration)) // Total duration
+            Text(player.formatTime(player.totalDuration)) // Total duration
         }
         .font(.caption)
         .foregroundStyle(.primary)
     }
-    
-    
     
     private var upperButtons: some View {
         HStack(spacing: 16) {
@@ -110,8 +131,12 @@ extension PlayControllerView {
             }
             
             Button {
-                vm.togglePlayback()
-            } label: { ControllButton(icon: vm.isPlaying ? "pause.fill" : "play.fill", size: 35) }
+//                vm.togglePlayback()
+                guard let url = URL(string: nasheed.audio) else { return }
+                player.togglePlayPause(url: url)
+                
+                
+            } label: { ControllButton(icon: player.isPlaying ? "pause.fill" : "play.fill", size: 35) }
             
             Button {
                 // Skip forward

@@ -45,6 +45,7 @@ struct PlayingDetailView: View {
                         Spacer()
                         
                         Button(action: {
+                            AudioPlayerManager.shared.stop()
                             self.miniHandler.dismiss()
                         }) {
                             Image(systemName: "xmark")
@@ -69,7 +70,7 @@ struct PlayingDetailView: View {
                     // makes the image centered if not minimized, but if minimized, it makes it leading age
                     if miniHandler.isMinimized == false {Spacer(minLength: 0)}
                     
-                    Image("nasheedImage")
+                    Image(nasheed.image)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(width: self.imageSize(proxy: proxy), height: self.imageSize(proxy: proxy))
@@ -80,11 +81,11 @@ struct PlayingDetailView: View {
                     //Mini view
                     if miniHandler.isMinimized {
                         VStack(alignment: .leading) {
-                            Text(nasheed.nasheedName)
+                            Text(nasheed.nasheed)
                                 .font(.title2)
                                 .fontDesign(.serif)
                                 .fixedSize(horizontal: true, vertical: false)
-                                .matchedGeometryEffect(id: nasheed.nasheedName, in: animationNamespaceId)
+                                .matchedGeometryEffect(id: nasheed.nasheed, in: animationNamespaceId)
                             
                             
                             Text(nasheed.reciter)
@@ -108,12 +109,12 @@ struct PlayingDetailView: View {
                 
                 if self.miniHandler.isMinimized == false {
                     VStack {
-                        Text(nasheed.nasheedName)
+                        Text(nasheed.nasheed)
                             .font(.title)
                             .fontDesign(.serif)
                             .lineLimit(1)
                             .truncationMode(.tail)
-                            .matchedGeometryEffect(id: nasheed.nasheedName, in: animationNamespaceId)
+                            .matchedGeometryEffect(id: nasheed.nasheed, in: animationNamespaceId)
                             .fixedSize(horizontal: true, vertical: false)
                         
                         
@@ -141,27 +142,7 @@ struct PlayingDetailView: View {
         
     } //Body
     
-    
-//    var doubleText: some View {
-//        VStack(alignment: self.miniHandler.isMinimized ? .leading : .center) {
-//            Text(nasheed.nasheedName)
-//                .font(miniHandler.isMinimized ? .title2: .title)
-//                .fontDesign(.serif)
-//                .fixedSize(horizontal: true, vertical: false)
-//                .matchedGeometryEffect(id: nasheed.nasheedName, in: animationNamespaceId)
-//            
-//            
-//            Text(nasheed.reciter)
-//                .font(miniHandler.isMinimized ? .subheadline: .title2)
-//                .fontDesign(.serif)
-//                .foregroundStyle(.secondary)
-//                .fixedSize(horizontal: true, vertical: false)
-//                .matchedGeometryEffect(id: nasheed.reciter, in: animationNamespaceId)
-//            
-//        }
-//    }
-    
-    
+        
     var minimizedControls: some View {
         HStack(spacing: 16) {
             Button(action: {}, label: {
@@ -198,8 +179,9 @@ struct PlayingDetailView: View {
 
 
 #Preview {
+    @Previewable @Namespace var previewNamespace
     NavigationStack {
-        PlayingDetailView(nasheed: dev.mockData, animationNamespaceId: try! Namespace().wrappedValue)
+        PlayingDetailView(nasheed: dev.mockData, animationNamespaceId: previewNamespace)
     }
     .environmentObject(dev.nasheedVM)
     .environmentObject(MinimizableViewHandler())

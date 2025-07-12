@@ -15,7 +15,9 @@ class DeveloperPreview {
     private init() { }
 
     let nasheedVM = NasheedViewModel()
-    let mockData = NasheedModel(reciter: "Muhammad Tohir", nasheedName: "Xuz Dimana", picture: Image("nasheedImage"))
+    
+    let mockData = NasheedModel(reciter: "Muhammad Tohir", nasheed: "Xuz Dimana", image: "https://cdn.pixabay.com/photo/2016/10/13/09/06/lake-1733352_1280.jpg", audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3")
+    
     
     
 }

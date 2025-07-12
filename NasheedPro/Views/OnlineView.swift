@@ -28,6 +28,9 @@ struct OnlineView: View {
         .toolbar {
             searchToolBar
         }
+        .task {
+            await viewModel.loadNasheeds()
+        }
         
     }
 }
@@ -76,6 +79,11 @@ extension OnlineView {
                         .onTapGesture {
                             withAnimation(.spring){
                                 selectedNasheed = nasheed
+                                
+                                if let url = URL(string: nasheed.audio) {
+                                    AudioPlayerManager.shared.loadAndPlay(url: url)
+                                }
+                                
                                 if self.miniHandler.isPresented {
                                     self.miniHandler.expand()
                                 } else {
@@ -93,6 +101,10 @@ extension OnlineView {
             }
             .scrollIndicators(.hidden)
             .listStyle(.plain)
+            .safeAreaInset(edge: .bottom) {
+                Color.clear
+                    .frame(height: miniHandler.isMinimized ? 68 : 0)
+            }
             
         }
          .searchable(text: $viewModel.searchText,

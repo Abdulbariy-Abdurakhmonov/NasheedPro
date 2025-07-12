@@ -8,15 +8,25 @@
 import Foundation
 import SwiftUICore
 
-class NasheedModel: Identifiable {
-    let id: String = UUID().uuidString
-    var reciter: String
-    var nasheedName: String
-    var picture: Image?
+/*
+ url = https://gist.githubusercontent.com/Abdulbariy-Abdurakhmonov/84e3c82958f40aaf03a604e69a6bd0a3/raw/03488719f558a7d3c6b77cfeafdf37231ed595e0/nasheeds.json
+ 
+ 
+
+
+ 
+ */
+
+
+struct NasheedModel: Identifiable, Codable {
+    var id = UUID().uuidString
+    let reciter: String
+    let nasheed: String
+    let image: String
+    let audio: String
     
-    init(reciter: String, nasheedName: String, picture: Image? = nil) {
-        self.reciter = reciter
-        self.nasheedName = nasheedName
-        self.picture = picture
-    }
+    private enum CodingKeys: String, CodingKey {
+            case reciter, nasheed, image, audio
+        }
+    
 }

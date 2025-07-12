@@ -35,11 +35,11 @@ struct ColorTheme {
     
     let background = Color("BackgroundColor")
     let accent = Color("AccentColor")
-    let primary = Color("Primary")
+    let mainColor = Color("MainColor")
     
     var hex: Color {
         .init(hex: "222831")
     }
 }
 
-let primary = Color.theme.primary
+let primary = Color.theme.mainColor
