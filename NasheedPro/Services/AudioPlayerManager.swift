@@ -12,9 +12,10 @@ class AudioPlayerManager: ObservableObject {
     
     @Published var timer: Timer?
     @Published var progress: Double = 0.0
-    @Published var totalDuration: Double = 200
-    
+    @Published var totalDuration: Double = 0
     @Published var previewProgress: Double? = nil
+    @Published var isPlayerReady: Bool = false
+
     
     //
     static let shared = AudioPlayerManager()
@@ -48,6 +49,27 @@ class AudioPlayerManager: ObservableObject {
     }
     
     
+    func rewind15Seconds() {
+        guard let player = player else { return }
+        let currentTime = CMTimeGetSeconds(player.currentTime())
+        let newTime = max(currentTime - 15, 0)
+        player.seek(to: CMTime(seconds: newTime, preferredTimescale: 600))
+        progress = newTime
+    }
+    
+    
+
+    func forward15Seconds() {
+        guard let player = player else { return }
+        let currentTime = CMTimeGetSeconds(player.currentTime())
+        let duration = CMTimeGetSeconds(player.currentItem?.duration ?? CMTime(seconds: totalDuration, preferredTimescale: 600))
+        let newTime = min(currentTime + 15, duration)
+        player.seek(to: CMTime(seconds: newTime, preferredTimescale: 600))
+        progress = newTime
+    }
+
+    
+    
     
     func formatTime(_ time: Double) -> String {
         let minutes = Int(time) / 60
@@ -63,6 +85,7 @@ class AudioPlayerManager: ObservableObject {
         player = AVPlayer(url: url)
         player?.play()
         isPlaying = true
+        isPlayerReady = false
         
         // Reset and start timer
         timer?.invalidate()
@@ -81,8 +104,9 @@ class AudioPlayerManager: ObservableObject {
         Task {
             do {
                 if let duration = try await player?.currentItem?.asset.load(.duration) {
-                    await MainActor.run {
-                        totalDuration = CMTimeGetSeconds(duration)
+                    await MainActor.run { [weak self] in
+                        self?.totalDuration = CMTimeGetSeconds(duration)
+                        self?.isPlayerReady = true
                     }
                 }
             } catch {
@@ -107,6 +131,8 @@ class AudioPlayerManager: ObservableObject {
             player?.pause()
             timer?.invalidate()
             isPlaying = false
+            isPlayerReady = false
+            
         } else {
             if let currentAsset = player?.currentItem?.asset as? AVURLAsset {
                 if currentAsset.url != url {
@@ -117,7 +143,6 @@ class AudioPlayerManager: ObservableObject {
                 player = AVPlayer(url: url)
             }
             
-            
             // Start playback
             player?.play()
             isPlaying = true
@@ -125,8 +150,10 @@ class AudioPlayerManager: ObservableObject {
             Task {
                 do {
                     if let duration = try await player?.currentItem?.asset.load(.duration) {
-                        await MainActor.run {
-                            totalDuration = CMTimeGetSeconds(duration)
+                        await MainActor.run { [weak self] in
+                            self?.totalDuration = CMTimeGetSeconds(duration)
+                            self?.isPlayerReady = true
+                            
                         }
                     }
                 } catch {

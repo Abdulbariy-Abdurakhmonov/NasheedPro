@@ -18,10 +18,6 @@ struct PlayControllerView: View {
     @StateObject var player = AudioPlayerManager.shared
     
     let haptic = HapticManager.shared
-
-    
-    
-
     
     let nasheed: NasheedModel
     
@@ -59,7 +55,8 @@ extension PlayControllerView {
                     
                     
                     let currentProgress = player.previewProgress ?? player.progress
-                    let progressRatio = currentProgress / player.totalDuration
+                    let progressRatio = player.totalDuration > 0 ? currentProgress / player.totalDuration : 0
+
 
                     // Custom Progress Bar
                     RoundedRectangle(cornerRadius: 2)
@@ -84,7 +81,7 @@ extension PlayControllerView {
                                 }
                                 .onEnded { value in
                                         let newProgress = min(max(0, value.location.x / sliderWidth * player.totalDuration), player.totalDuration)
-                                        player.seek(to: newProgress) // updates actual audio position
+                                        player.seek(to: newProgress)
                                     player.previewProgress = nil
                                     haptic.playSelection()
                                     
@@ -106,12 +103,11 @@ extension PlayControllerView {
         .padding(.horizontal)
     }
     
-        
     private var timeLabel: some View {
         HStack {
-            Text(player.formatTime(player.previewProgress ?? player.progress))  // Current time
+            Text(player.formatTime(player.previewProgress ?? player.progress))
             Spacer()
-            Text(player.formatTime(player.totalDuration)) // Total duration
+            Text(player.formatTime(player.totalDuration))
         }
         .font(.caption)
         .foregroundStyle(.primary)
@@ -120,8 +116,9 @@ extension PlayControllerView {
     private var upperButtons: some View {
         HStack(spacing: 16) {
             Button {
-                // Rewind 15 seconds
-            } label: { ControllButton(icon: "15.arrow.trianglehead.counterclockwise", size: 24) }
+                player.rewind15Seconds()
+            } label: { ControllButton(icon: "15.arrow.trianglehead.counterclockwise", size: 24) }.disabled(!player.isPlayerReady)
+            
             
             Button {
                 // Skip backward
@@ -142,6 +139,7 @@ extension PlayControllerView {
             
             Button {
                 // Skip forward
+                
             } label: {
                 HStack(spacing: -20) {
                     ControllButton(icon: "arrowtriangle.right.fill", size: 22)
@@ -150,13 +148,12 @@ extension PlayControllerView {
             }
             
             Button {
-                // Fast forward 15 seconds
-            } label: { ControllButton(icon: "15.arrow.trianglehead.clockwise", size: 24) }
+                player.forward15Seconds()
+            } label: { ControllButton(icon: "15.arrow.trianglehead.clockwise", size: 24) }.disabled(!player.isPlayerReady)
         }
         .padding(.vertical, 26)
         .padding(.bottom, 28)
     }
-    
     
     private var lowerButtons: some View {
         HStack {
