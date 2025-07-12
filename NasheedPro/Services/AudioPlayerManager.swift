@@ -131,7 +131,6 @@ class AudioPlayerManager: ObservableObject {
             player?.pause()
             timer?.invalidate()
             isPlaying = false
-            isPlayerReady = false
             
         } else {
             if let currentAsset = player?.currentItem?.asset as? AVURLAsset {
@@ -152,7 +151,6 @@ class AudioPlayerManager: ObservableObject {
                     if let duration = try await player?.currentItem?.asset.load(.duration) {
                         await MainActor.run { [weak self] in
                             self?.totalDuration = CMTimeGetSeconds(duration)
-                            self?.isPlayerReady = true
                             
                         }
                     }

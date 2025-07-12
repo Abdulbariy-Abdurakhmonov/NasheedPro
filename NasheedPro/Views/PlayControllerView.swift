@@ -114,45 +114,59 @@ extension PlayControllerView {
     }
     
     private var upperButtons: some View {
-        HStack(spacing: 16) {
-            Button {
-                player.rewind15Seconds()
-            } label: { ControllButton(icon: "15.arrow.trianglehead.counterclockwise", size: 24) }.disabled(!player.isPlayerReady)
-            
-            
-            Button {
-                // Skip backward
-            } label: {
-                HStack(spacing: -20) {
-                    ControllButton(icon: "arrowtriangle.left.fill", size: 19)
-                    ControllButton(icon: "arrowtriangle.left.fill", size: 22)
+        
+            HStack(spacing: 16) {
+                Button {
+                    player.rewind15Seconds()
+                } label: { ControllButton(icon: "15.arrow.trianglehead.counterclockwise", size: 24) }.disabled(!player.isPlayerReady)
+                
+                
+                Button {
+                    // Skip backward
+                } label: {
+                    HStack(spacing: -20) {
+                        ControllButton(icon: "arrowtriangle.left.fill", size: 19)
+                        ControllButton(icon: "arrowtriangle.left.fill", size: 22)
+                    }
                 }
-            }
-            
-            Button {
                 
-                guard let url = URL(string: nasheed.audio) else { return }
-                player.togglePlayPause(url: url)
+                Button {
+                    
+                    guard let url = URL(string: nasheed.audio) else { return }
+                    player.togglePlayPause(url: url)
+                    
+                    
+                } label: { ControllButton(icon: player.isPlaying ? "pause.fill" : "play.fill", size: 35) }
                 
-                
-            } label: { ControllButton(icon: player.isPlaying ? "pause.fill" : "play.fill", size: 35) }
-            
-            Button {
-                // Skip forward
-                
-            } label: {
-                HStack(spacing: -20) {
-                    ControllButton(icon: "arrowtriangle.right.fill", size: 22)
-                    ControllButton(icon: "arrowtriangle.right.fill", size: 19)
+                Button {
+                    // Skip forward
+                    
+                } label: {
+                    HStack(spacing: -20) {
+                        ControllButton(icon: "arrowtriangle.right.fill", size: 22)
+                        ControllButton(icon: "arrowtriangle.right.fill", size: 19)
+                    }
                 }
-            }
+                
+                Button {
+                    player.forward15Seconds()
+                } label: { ControllButton(icon: "15.arrow.trianglehead.clockwise", size: 24) }.disabled(!player.isPlayerReady)
+            }.overlay(content: {
+                if !player.isPlayerReady {
+                       ProgressView()
+                           .progressViewStyle(CircularProgressViewStyle())
+                           .offset(x: -10, y: -35)
+                   }
+            })
             
-            Button {
-                player.forward15Seconds()
-            } label: { ControllButton(icon: "15.arrow.trianglehead.clockwise", size: 24) }.disabled(!player.isPlayerReady)
-        }
-        .padding(.vertical, 26)
-        .padding(.bottom, 28)
+            .padding(.vertical, 26)
+            .padding(.bottom, 28)
+            
+           
+            
+      
+        
+        
     }
     
     private var lowerButtons: some View {
