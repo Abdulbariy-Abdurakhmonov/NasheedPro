@@ -12,6 +12,7 @@ struct MarqueeText: View {
     let text: String
     let font: UIFont
     let speed: Double = 30 // pixels per second
+    
 
     @State private var textWidth: CGFloat = 0
 
@@ -24,6 +25,7 @@ struct MarqueeText: View {
                 let totalDistance = textWidth + containerWidth
                 let x = CGFloat(now.truncatingRemainder(dividingBy: totalDistance / speed)) * speed
 
+
                 HStack {
                     Text(text)
                         .font(Font(font))
@@ -31,40 +33,48 @@ struct MarqueeText: View {
                         .fixedSize()
                         .lineLimit(1)
                         .background(WidthGetter(width: $textWidth))
-//                        .offset(x: containerWidth - x)
-                        .offset(x: geo.size.width - x)
+                        .offset(x: textWidth > containerWidth ? geo.size.width - x : 0)
 
                     Spacer(minLength: 0)
                 }
                 .frame(width: containerWidth, alignment: .leading)
-                .mask(
-                    HStack(spacing: 0) {
-                        // Start (right side visually)
-                        LinearGradient(
-                            gradient: Gradient(colors: [.clear, .black]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                        .frame(width: 20)
-
-                        Rectangle()
-                            .fill(Color.black)
-
-                        // End (left side visually)
-                        LinearGradient(
-                            gradient: Gradient(colors: [.black, .clear]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                        .frame(width: 20)
-                    }
-                )
-
+                .mask(fadeMask(width: geo.size.width))
             }
         }
         .clipped()
     }
+    
+    @ViewBuilder
+    private func fadeMask(width: CGFloat) -> some View {
+        if textWidth > width {
+            HStack(spacing: 0) {
+                LinearGradient(
+                    gradient: Gradient(colors: [.clear, .black]),
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+                .frame(width: 20)
+
+                Rectangle().fill(Color.black)
+
+                LinearGradient(
+                    gradient: Gradient(colors: [.black, .clear]),
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+                .frame(width: 20)
+            }
+        } else {
+            // Text fits – show full
+            Rectangle().fill(Color.black)
+        }
+    }
+    
 }
+
+
+
+
 
 
 

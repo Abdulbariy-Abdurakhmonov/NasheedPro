@@ -84,6 +84,7 @@ struct PlayingDetailView: View {
                                 Spacer()
                                 
                                 MarqueeText(text: nasheed.nasheed, font: .systemFont(ofSize: 24, weight: .regular))
+                                    .matchedGeometryEffect(id: nasheed.nasheed, in: animationNamespaceId)
                                
                                 
                                 
