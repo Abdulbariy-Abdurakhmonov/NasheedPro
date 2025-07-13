@@ -17,7 +17,6 @@ class AudioPlayerManager: ObservableObject {
     @Published var isPlayerReady: Bool = false
 
     
-    //
     static let shared = AudioPlayerManager()
     
     private var player: AVPlayer?

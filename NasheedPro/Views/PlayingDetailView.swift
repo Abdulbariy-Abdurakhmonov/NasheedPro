@@ -66,7 +66,6 @@ struct PlayingDetailView: View {
                 
                 HStack(spacing: 15){
                     
-                    // makes the image centered if not minimized, but if minimized, it makes it leading age
                     if miniHandler.isMinimized == false {Spacer(minLength: 0)}
                     
                     Image(nasheed.image)
@@ -74,39 +73,45 @@ struct PlayingDetailView: View {
                         .aspectRatio(contentMode: .fill)
                         .frame(width: self.imageSize(proxy: proxy), height: self.imageSize(proxy: proxy))
                         .cornerRadius(30)
-
-
+     
                     
                     //Mini view
                     if miniHandler.isMinimized {
-                        VStack(alignment: .leading) {
-                            Text(nasheed.nasheed)
-                                .font(.title2)
-                                .fontDesign(.serif)
-                                .fixedSize(horizontal: true, vertical: false)
-                                .matchedGeometryEffect(id: nasheed.nasheed, in: animationNamespaceId)
-                            
-                            
-                            
-                            Text(nasheed.reciter)
-                                .font(.subheadline)
-                                .fontDesign(.serif)
-                                .foregroundStyle(.secondary)
-                                .fixedSize(horizontal: true, vertical: false)
-                                .matchedGeometryEffect(id: nasheed.reciter, in: animationNamespaceId)
-                        }
                         
-                        Spacer(minLength: 0)
-
-                        MinimizedController(nasheed: nasheed, player: AudioPlayerManager.shared)
+                        HStack {
+                            VStack(alignment: .leading) {
+                                
+                                Spacer()
+                                
+                                MarqueeText(text: nasheed.nasheed, font: .systemFont(ofSize: 24, weight: .regular))
+                               
+                                
+                                
+                                Text(nasheed.reciter)
+                                    .font(.subheadline)
+                                    .fontDesign(.serif)
+                                    .foregroundStyle(.secondary)
+                                    .fixedSize(horizontal: true, vertical: false)
+                                    .matchedGeometryEffect(id: nasheed.reciter, in: animationNamespaceId)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            
+                            Spacer(minLength: 0)
+        
+                            
+                            MinimizedController(nasheed: nasheed, player: AudioPlayerManager.shared)
+                                .padding(.trailing, 16)
+                                .frame(width: 100)
+                                .padding(.leading, 6)
+                        }
                             
                     } else {
                         Spacer(minLength: 0)
                     }
                 }
-                .padding(.horizontal)
-                
-             
+
+                .padding(.leading)
+
                 
                 if self.miniHandler.isMinimized == false {
                     VStack {
@@ -142,10 +147,8 @@ struct PlayingDetailView: View {
         }.transition(AnyTransition.move(edge: .bottom))
         
     } //Body
+
     
-        
-    
-    // square shaped, so we only need the edge length
     func imageSize(proxy: GeometryProxy)->CGFloat {
         if miniHandler.isMinimized {
             return 55 + abs(self.miniHandler.draggedOffsetY) / 2

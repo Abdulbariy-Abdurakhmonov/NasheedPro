@@ -15,7 +15,10 @@ struct MinimizedController: View {
     @ObservedObject var player: AudioPlayerManager
     
     var body: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 0){
+            
+            Spacer()
+            
             Button(action: {
                 guard let url = URL(string: nasheed.audio) else { return }
                 AudioPlayerManager.shared.togglePlayPause(url: url)
@@ -32,6 +35,6 @@ struct MinimizedController: View {
                     .foregroundColor(.primary)
             })
         }
-        .padding(.trailing, 16)
+        
     }
 }
