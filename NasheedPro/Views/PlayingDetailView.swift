@@ -17,6 +17,7 @@ struct PlayingDetailView: View {
     var nasheed: NasheedModel
     var animationNamespaceId: Namespace.ID
     
+    
     var body: some View {
         //Background Layer
         GeometryReader { proxy in
@@ -74,22 +75,21 @@ struct PlayingDetailView: View {
                         .frame(width: self.imageSize(proxy: proxy), height: self.imageSize(proxy: proxy))
                         .cornerRadius(30)
      
+
                     
-                    //Mini view
                     if miniHandler.isMinimized {
-                        
+                    
                         HStack {
                             VStack(alignment: .leading) {
-                                
                                 Spacer()
                                 
-                                MarqueeText(text: nasheed.nasheed, font: .systemFont(ofSize: 24, weight: .regular))
+                                MarqueeText(text: nasheed.nasheed, font: .system(size: 23.5, weight: .regular))
                                     .matchedGeometryEffect(id: nasheed.nasheed, in: animationNamespaceId)
-                               
-                                
+                                    .fontDesign(.serif)
+          
                                 
                                 Text(nasheed.reciter)
-                                    .font(.subheadline)
+                                    .font(.headline)
                                     .fontDesign(.serif)
                                     .foregroundStyle(.secondary)
                                     .fixedSize(horizontal: true, vertical: false)
@@ -116,23 +116,17 @@ struct PlayingDetailView: View {
                 
                 if self.miniHandler.isMinimized == false {
                     VStack {
-                        Text(nasheed.nasheed)
-                            .font(.title)
+                        AnimatedText(text: nasheed.nasheed, font: .title, delay: 0.05)
                             .fontDesign(.serif)
                             .lineLimit(1)
                             .truncationMode(.tail)
-                            .matchedGeometryEffect(id: nasheed.nasheed, in: animationNamespaceId)
-                            .fixedSize(horizontal: true, vertical: false)
+                            .padding(.horizontal)
                         
-                        
-                        Text(nasheed.reciter)
-                            .font(.title2)
+                        AnimatedText(text: nasheed.reciter, font: .title2, delay: 0.05)
                             .fontDesign(.serif)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                             .truncationMode(.tail)
-                            .matchedGeometryEffect(id: nasheed.reciter, in: animationNamespaceId)
-                            .fixedSize(horizontal: true, vertical: false)
                         
                         
                         PlayControllerView(isPlaying: $isPlaying, nasheed: nasheed)
@@ -145,9 +139,11 @@ struct PlayingDetailView: View {
                 
                 
             }
+           
+
         }.transition(AnyTransition.move(edge: .bottom))
         
-    } //Body
+    }
 
     
     func imageSize(proxy: GeometryProxy)->CGFloat {
@@ -159,8 +155,7 @@ struct PlayingDetailView: View {
         
     }
     
-} //Struct
-
+}
 
 
 

@@ -10,11 +10,12 @@ import SwiftUI
 
 struct MarqueeText: View {
     let text: String
-    let font: UIFont
+    let font: Font
     let speed: Double = 30 // pixels per second
     
 
     @State private var textWidth: CGFloat = 0
+
 
     var body: some View {
         GeometryReader { geo in
@@ -28,7 +29,7 @@ struct MarqueeText: View {
 
                 HStack {
                     Text(text)
-                        .font(Font(font))
+                        .font(font)
                         .fontDesign(.serif)
                         .fixedSize()
                         .lineLimit(1)
@@ -65,7 +66,6 @@ struct MarqueeText: View {
                 .frame(width: 20)
             }
         } else {
-            // Text fits – show full
             Rectangle().fill(Color.black)
         }
     }
