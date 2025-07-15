@@ -17,6 +17,8 @@ struct PlayingDetailView: View {
     var nasheed: NasheedModel
     var animationNamespaceId: Namespace.ID
     
+//    @State var shouldAnimateText = true
+    
     
     var body: some View {
         //Background Layer
@@ -116,17 +118,19 @@ struct PlayingDetailView: View {
                 
                 if self.miniHandler.isMinimized == false {
                     VStack {
-                        AnimatedText(text: nasheed.nasheed, font: .title, delay: 0.05)
+                        AnimatedText(text: nasheed.nasheed, font: .title, delay: 0.02)
                             .fontDesign(.serif)
                             .lineLimit(1)
                             .truncationMode(.tail)
                             .padding(.horizontal)
+                            .id(nasheed.id)
                         
-                        AnimatedText(text: nasheed.reciter, font: .title2, delay: 0.05)
+                        AnimatedText(text: nasheed.reciter, font: .title2, delay: 0.02)
                             .fontDesign(.serif)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                             .truncationMode(.tail)
+                            .id(nasheed.id)
                         
                         
                         PlayControllerView(isPlaying: $isPlaying, nasheed: nasheed)
@@ -136,12 +140,18 @@ struct PlayingDetailView: View {
                 }
                 
                 Spacer()
-                
-                
             }
            
-
         }.transition(AnyTransition.move(edge: .bottom))
+        
+        // this is normal behaviour of Text
+//            .onChange(of: miniHandler.isMinimized) { _, isMinimized in
+//                if isMinimized == false {
+//                    shouldAnimateText = false
+//                } else {
+//                    shouldAnimateText = true
+//                }
+//            }
         
     }
 
@@ -152,9 +162,7 @@ struct PlayingDetailView: View {
         } else {
             return proxy.size.height * 0.36
         }
-        
     }
-    
 }
 
 

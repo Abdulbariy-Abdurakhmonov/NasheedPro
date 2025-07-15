@@ -16,12 +16,17 @@ class AudioPlayerManager: ObservableObject {
     @Published var previewProgress: Double? = nil
     @Published var isPlayerReady: Bool = false
 
-    
     static let shared = AudioPlayerManager()
-    
     private var player: AVPlayer?
     
     @Published var isPlaying = false
+    //
+    @Published var allNasheeds: [NasheedModel] = []
+    @Published var currentIndex: Int = 0
+
+    
+    var onNasheedChange: ((NasheedModel) -> Void)?
+
     
     func play(url: URL) {
         if player?.currentItem?.asset as? AVURLAsset != AVURLAsset(url: url) {
@@ -57,7 +62,6 @@ class AudioPlayerManager: ObservableObject {
     }
     
     
-
     func forward15Seconds() {
         guard let player = player else { return }
         let currentTime = CMTimeGetSeconds(player.currentTime())
@@ -68,8 +72,6 @@ class AudioPlayerManager: ObservableObject {
     }
 
     
-    
-    
     func formatTime(_ time: Double) -> String {
         let minutes = Int(time) / 60
         let seconds = Int(time) % 60
@@ -77,7 +79,34 @@ class AudioPlayerManager: ObservableObject {
     }
     
     
+    func playNext() {
+        let nextIndex = currentIndex + 1
+        guard allNasheeds.indices.contains(nextIndex) else { return }
+        loadAndPlay(nasheeds: allNasheeds, index: nextIndex)
+    }
+
     
+    func playPrevious() {
+        let prevIndex = currentIndex - 1
+        guard allNasheeds.indices.contains(prevIndex) else { return }
+        loadAndPlay(nasheeds: allNasheeds, index: prevIndex)
+    }
+
+    
+    func loadAndPlay(nasheeds: [NasheedModel], index: Int) {
+        guard nasheeds.indices.contains(index),
+              let url = URL(string: nasheeds[index].audio) else { return }
+        
+        self.allNasheeds = nasheeds
+        self.currentIndex = index
+//        self.currentNasheed = nasheeds[index] // if you keep this
+        DispatchQueue.main.async {
+            self.onNasheedChange?(nasheeds[index])
+        }
+
+        loadAndPlay(url: url)
+    }
+
     
     func loadAndPlay(url: URL) {
         player?.pause()

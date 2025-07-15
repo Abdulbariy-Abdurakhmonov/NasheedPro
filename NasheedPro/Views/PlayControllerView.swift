@@ -122,7 +122,7 @@ extension PlayControllerView {
                 
                 
                 Button {
-                    // Skip backward
+                    player.playPrevious()
                 } label: {
                     HStack(spacing: -20) {
                         ControllButton(icon: "arrowtriangle.left.fill", size: 19)
@@ -139,7 +139,7 @@ extension PlayControllerView {
                 } label: { ControllButton(icon: player.isPlaying ? "pause.fill" : "play.fill", size: 35) }
                 
                 Button {
-                    // Skip forward
+                    player.playNext()
                     
                 } label: {
                     HStack(spacing: -20) {

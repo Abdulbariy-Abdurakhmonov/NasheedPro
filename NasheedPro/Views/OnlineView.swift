@@ -18,6 +18,7 @@ struct OnlineView: View {
 
     
     
+    
     var body: some View {
         ZStack {
             Color.theme.background
@@ -77,19 +78,28 @@ extension OnlineView {
                     NasheedRowView(nasheed: nasheed)
                     
                         .onTapGesture {
-                            withAnimation(.spring){
-                                selectedNasheed = nasheed
+                            
+                            if let index = viewModel.filteredNasheeds.firstIndex(where: { $0.id == nasheed.id }) {
                                 
-                                if let url = URL(string: nasheed.audio) {
-                                    AudioPlayerManager.shared.loadAndPlay(url: url)
+                                AudioPlayerManager.shared.loadAndPlay(nasheeds: viewModel.filteredNasheeds, index: index)
+                                
+                                AudioPlayerManager.shared.onNasheedChange  = { newNasheed in
+                                    withAnimation(.spring()) {
+                                        selectedNasheed = newNasheed
+                                    }
                                 }
                                 
-                                if self.miniHandler.isPresented {
-                                    self.miniHandler.expand()
-                                } else {
-                                    self.miniHandler.present()
+                               
+                                withAnimation(.spring) {
+                
+                                    if self.miniHandler.isPresented {
+                                        self.miniHandler.expand()
+                                    } else {
+                                        self.miniHandler.present()
+                                    }
                                 }
                             }
+                            
                            
                             
                         }
