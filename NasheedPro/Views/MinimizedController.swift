@@ -24,7 +24,7 @@ struct MinimizedController: View {
                 AudioPlayerManager.shared.togglePlayPause(url: url)
                 
             }, label: {
-                ControllButton(icon: player.isPlaying ? "pause.fill" : "play.fill", size: 28)
+                ControllButton(icon: player.isPlaying ? "pause.fill" : "play.fill", size: 28, color: primary)
 
             })
             

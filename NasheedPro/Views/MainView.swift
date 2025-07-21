@@ -4,6 +4,8 @@ import SwiftUI
 import MinimizableView
 
 struct MainView: View {
+    
+    
     @EnvironmentObject var viewModel: NasheedViewModel
     @EnvironmentObject var miniHandler: MinimizableViewHandler
     @Namespace var namespace
@@ -17,6 +19,9 @@ struct MainView: View {
     
     var body: some View {
         tabViews
+        .task {
+            await viewModel.loadNasheeds()
+            }
         .onAppear {
             miniVM.setHandler(miniHandler)
         }
@@ -54,7 +59,7 @@ extension MainView {
                 })
             
             NavigationView {
-                LikedView()
+                LikedView(selectedNasheed: $selectedNasheed)
             }
             .tabItem {
                 Image(systemName: "heart.fill")
@@ -62,7 +67,7 @@ extension MainView {
             }.tag(1)
             
             NavigationView {
-                DownloadedView()
+                DownloadedView(selectedNasheed: $selectedNasheed)
             }
             .tabItem {
                 Image(systemName: "bookmark.fill")

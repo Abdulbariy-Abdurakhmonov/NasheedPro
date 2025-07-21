@@ -19,8 +19,10 @@ struct NasheedProApp: App {
             NavigationStack {
                 MainView()
             }
+            .environmentObject(viewmodel)
+            .environmentObject(miniHandler)
+            
         }
-        .environmentObject(viewmodel)
-        .environmentObject(miniHandler)
+        
     }
 }

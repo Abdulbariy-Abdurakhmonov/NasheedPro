@@ -11,26 +11,22 @@ import MinimizableView
 struct OnlineView: View {
     
     @EnvironmentObject private var viewModel: NasheedViewModel
-    @EnvironmentObject private var miniHandler: MinimizableViewHandler
-    @State private var showDetailView: Bool = false
     @Binding var selectedNasheed: NasheedModel?
-    @Namespace var namespace
 
-    
-    
+        
     
     var body: some View {
-        ZStack {
-            Color.theme.background
-                .ignoresSafeArea()
-           listView
-            
-        }
-        .toolbar {
-            searchToolBar
-        }
-        .task {
-            await viewModel.loadNasheeds()
+        
+        ListVIew(
+            title: "Streaming",
+            emptyMessage: "No saved nasheeds yet.",
+            emptyIcon: "wifi.slash",
+            emptyDescription: "Be online to discover nasheed",
+            nasheedsOf: viewModel.filteredNasheeds,
+            selectedNasheed: $selectedNasheed)
+        
+        .onAppear {
+            viewModel.currentScope = .all
         }
         
     }
@@ -48,84 +44,4 @@ struct OnlineView: View {
 }
 
 
-
-
-extension OnlineView {
-    
-    private var searchToolBar: some ToolbarContent {
-        ToolbarItem(placement: .topBarTrailing) {
-            Menu {
-                Button("Search by Reciter Name") {
-                    viewModel.searchMode = .reciter }
-                Button("Search by Nasheed Name") {
-                    viewModel.searchMode = .nasheed }
-            } label: {
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                    Text(viewModel.searchMode == .reciter ? "Reciter" : "Nasheed")
-                }
-                .font(.subheadline)
-            }
-        }
-    }
-    
-    
-    private var listView: some View {
-        VStack {
-            List {
-                ForEach(viewModel.filteredNasheeds) { nasheed in
-                    
-                    NasheedRowView(nasheed: nasheed)
-                    
-                        .onTapGesture {
-                            
-                            if let index = viewModel.filteredNasheeds.firstIndex(where: { $0.id == nasheed.id }) {
-                                
-                                AudioPlayerManager.shared.loadAndPlay(nasheeds: viewModel.filteredNasheeds, index: index)
-                                
-                                AudioPlayerManager.shared.onNasheedChange  = { newNasheed in
-                                    withAnimation(.spring()) {
-                                        selectedNasheed = newNasheed
-                                    }
-                                }
-                                
-                               
-                                withAnimation(.spring) {
-                
-                                    if self.miniHandler.isPresented {
-                                        self.miniHandler.expand()
-                                    } else {
-                                        self.miniHandler.present()
-                                    }
-                                }
-                            }
-                            
-                           
-                            
-                        }
-                        .padding(.trailing, 20)
-                        .listRowBackground(Color.clear)
-                }
-                .listSectionSeparator(.hidden, edges: .all)
-                
-            }
-            .scrollIndicators(.hidden)
-            .listStyle(.plain)
-            .safeAreaInset(edge: .bottom) {
-                Color.clear
-                    .frame(height: miniHandler.isMinimized ? 68 : 0)
-            }
-            
-        }
-         .searchable(text: $viewModel.searchText,
-                     prompt: viewModel.searchMode ==
-            .reciter ? "Search a reciter..." :  "Search a nasheed...")
-         .navigationTitle("All Nasheeds")
-         .toolbarTitleDisplayMode(.inline)
-
-    }
-}
-
-    
-    
 

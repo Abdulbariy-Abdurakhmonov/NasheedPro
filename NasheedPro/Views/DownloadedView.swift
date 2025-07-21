@@ -6,13 +6,35 @@
 //
 
 import SwiftUI
+import MinimizableView
 
 struct DownloadedView: View {
+    
+    @EnvironmentObject private var viewModel: NasheedViewModel
+    @Binding var selectedNasheed: NasheedModel?
+    
     var body: some View {
-        Text("Downloaded view")
+        
+        ListVIew(title: "Downloaded Nasheeds",
+                 emptyMessage: "No downloaded nasheed yet.",
+                 emptyIcon: "bookmark.slash.fill",
+                 emptyDescription: "Download a nasheed to see it here.",
+                 nasheedsOf: viewModel.filteredNasheeds,
+                 selectedNasheed: $selectedNasheed)
+        .onAppear {
+            viewModel.currentScope = .downloaded
+        }
     }
+        
 }
 
+
+
+
 #Preview {
-    DownloadedView()
+    NavigationStack {
+        DownloadedView(selectedNasheed: .constant(.none))
+    }
+    .environmentObject(dev.nasheedVM)
+    .environmentObject(MinimizableViewHandler())
 }

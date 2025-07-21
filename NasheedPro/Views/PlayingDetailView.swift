@@ -12,7 +12,7 @@ struct PlayingDetailView: View {
     @EnvironmentObject var miniHandler: MinimizableViewHandler
     @EnvironmentObject var viewModel: NasheedViewModel
     @State var isPlaying: Bool = false
-    var nasheed: NasheedModel
+    @ObservedObject var nasheed: NasheedModel
     var animationNamespaceId: Namespace.ID
     
     

@@ -6,13 +6,35 @@
 //
 
 import SwiftUI
+import MinimizableView
 
 struct LikedView: View {
+    
+    @EnvironmentObject var viewModel: NasheedViewModel
+    @Binding var selectedNasheed: NasheedModel?
+    
     var body: some View {
-        Text("Liked view")
+        
+        ListVIew(title: "My Favorites",
+                 emptyMessage: "No liked nasheeds yet.",
+                 emptyIcon: "heart.slash.fill",
+                 emptyDescription: "Like a nasheed to see it here.",
+                 nasheedsOf: viewModel.filteredNasheeds,
+                 selectedNasheed: $selectedNasheed)
+        .onAppear {
+            viewModel.currentScope = .liked
+        }
     }
+        
 }
 
+
+
+
 #Preview {
-    LikedView()
+    NavigationStack {
+        LikedView(selectedNasheed: .constant(.none))
+    }
+    .environmentObject(dev.nasheedVM)
+    .environmentObject(MinimizableViewHandler())
 }

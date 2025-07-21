@@ -13,13 +13,14 @@ struct PlayControllerView: View {
     
     @Binding var isPlaying: Bool
     @State private var isRepeating: Bool = false
-    @State private var isLiked: Bool = false
-
     @StateObject var player = AudioPlayerManager.shared
-    
     let haptic = HapticManager.shared
+
     
-    let nasheed: NasheedModel
+    @ObservedObject var nasheed: NasheedModel
+
+    
+    @EnvironmentObject var viewModel: NasheedViewModel
     
     var body: some View {
         VStack {
@@ -33,7 +34,9 @@ struct PlayControllerView: View {
 
 
 #Preview {
-    PlayControllerView(isPlaying: .constant(false), nasheed: dev.mockData)
+    NavigationStack {
+        PlayControllerView(isPlaying: .constant(false), nasheed: dev.mockData)
+    }.environmentObject(dev.nasheedVM)
     //        .preferredColorScheme(.dark)
 }
 
@@ -118,15 +121,15 @@ extension PlayControllerView {
             HStack(spacing: 16) {
                 Button {
                     player.rewind15Seconds()
-                } label: { ControllButton(icon: "15.arrow.trianglehead.counterclockwise", size: 24) }.disabled(!player.isPlayerReady)
+                } label: { ControllButton(icon: "15.arrow.trianglehead.counterclockwise", size: 24, color: primary) }.disabled(!player.isPlayerReady)
                 
                 
                 Button {
                     player.playPrevious()
                 } label: {
                     HStack(spacing: -20) {
-                        ControllButton(icon: "arrowtriangle.left.fill", size: 19)
-                        ControllButton(icon: "arrowtriangle.left.fill", size: 22)
+                        ControllButton(icon: "arrowtriangle.left.fill", size: 19, color: primary)
+                        ControllButton(icon: "arrowtriangle.left.fill", size: 22, color: primary)
                     }
                 }
                 
@@ -136,21 +139,21 @@ extension PlayControllerView {
                     player.togglePlayPause(url: url)
                     
                     
-                } label: { ControllButton(icon: player.isPlaying ? "pause.fill" : "play.fill", size: 35) }
+                } label: { ControllButton(icon: player.isPlaying ? "pause.fill" : "play.fill", size: 35, color: primary) }
                 
                 Button {
                     player.playNext()
                     
                 } label: {
                     HStack(spacing: -20) {
-                        ControllButton(icon: "arrowtriangle.right.fill", size: 22)
-                        ControllButton(icon: "arrowtriangle.right.fill", size: 19)
+                        ControllButton(icon: "arrowtriangle.right.fill", size: 22, color: primary)
+                        ControllButton(icon: "arrowtriangle.right.fill", size: 19, color: primary)
                     }
                 }
                 
                 Button {
                     player.forward15Seconds()
-                } label: { ControllButton(icon: "15.arrow.trianglehead.clockwise", size: 24) }.disabled(!player.isPlayerReady)
+                } label: { ControllButton(icon: "15.arrow.trianglehead.clockwise", size: 24, color: primary) }.disabled(!player.isPlayerReady)
             }.overlay(content: {
                 if !player.isPlayerReady {
                        ProgressView()
@@ -161,11 +164,7 @@ extension PlayControllerView {
             
             .padding(.vertical, 26)
             .padding(.bottom, 28)
-            
-           
-            
-      
-        
+   
         
     }
     
@@ -173,20 +172,27 @@ extension PlayControllerView {
         HStack {
             Button {
                 isRepeating.toggle()
-            }label: { ControllButton(icon: isRepeating ? "moon.zzz" : "moon.zzz.fill", size: 28) }
+            }label: { ControllButton(icon: isRepeating ? "moon.zzz" : "moon.zzz.fill", size: 28, color: .secondary) }
 
             Spacer()
             
+            
             Button {
-                isLiked.toggle()
-            } label: { ControllButton(icon: isLiked ? "heart" : "heart.fill", size: 28) }
+
+                viewModel.toggleLike(for: nasheed)
+                
+            } label: {
+                ControllButton(
+                icon: nasheed.isLiked ? "heart.fill" : "heart",
+                size: 28,
+                color: nasheed.isLiked ? .pink : .secondary) }
             
             Spacer()
             
             Button {
                 isRepeating.toggle()
             } label: {
-                ControllButton(icon: isRepeating ? "repeat" : "repeat.1", size: 28)
+                ControllButton(icon: isRepeating ? "repeat" : "repeat.1", size: 28, color: .secondary)
             }
         }
         .padding(.horizontal, 55)

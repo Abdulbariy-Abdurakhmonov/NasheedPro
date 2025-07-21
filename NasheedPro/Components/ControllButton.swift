@@ -11,17 +11,18 @@ struct ControllButton: View {
     
     let icon: String
     let size: CGFloat
+    let color: Color
     
     var body: some View {
         Image(systemName: icon)
             .font(.system(size: size))
             .padding(.trailing)
-            .foregroundStyle(primary)
+            .foregroundStyle(color)
     }
 }
 
 
 #Preview {
-    ControllButton(icon: "info.circle", size: 40)
+    ControllButton(icon: "info.circle", size: 40, color: primary)
         
 }
