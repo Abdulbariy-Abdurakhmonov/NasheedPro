@@ -54,7 +54,6 @@ class NasheedViewModel: ObservableObject {
     }
     
     
-    
     var baseNasheeds: [NasheedModel] {
         switch currentScope {
         case .all:
@@ -72,7 +71,6 @@ class NasheedViewModel: ObservableObject {
     }
     
     
-    
     func searchNasheeds(in source: [NasheedModel], using text: String) -> [NasheedModel] {
         guard !text.isEmpty else { return source }
 
@@ -85,7 +83,6 @@ class NasheedViewModel: ObservableObject {
             }
         }
     }
-
 
     
     func loadNasheeds() async {
@@ -114,5 +111,6 @@ class NasheedViewModel: ObservableObject {
 
         
     }
+    
     
 }

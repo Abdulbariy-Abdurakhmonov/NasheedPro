@@ -19,7 +19,7 @@ class AudioPlayerManager: ObservableObject {
     static let shared = AudioPlayerManager()
     private var player: AVPlayer?
     
-    @Published var isPlaying = false
+    @Published var isPlaying = true
     //
     @Published var allNasheeds: [NasheedModel] = []
     @Published var currentIndex: Int = 0
@@ -150,8 +150,6 @@ class AudioPlayerManager: ObservableObject {
         player?.seek(to: cmTime)
         progress = time
     }
-    
-    
     
     func togglePlayPause(url: URL) {
         if isPlaying {

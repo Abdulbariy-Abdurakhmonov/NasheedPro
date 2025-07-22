@@ -11,7 +11,6 @@ struct PlayingDetailView: View {
     
     @EnvironmentObject var miniHandler: MinimizableViewHandler
     @EnvironmentObject var viewModel: NasheedViewModel
-    @State var isPlaying: Bool = false
     @ObservedObject var nasheed: NasheedModel
     var animationNamespaceId: Namespace.ID
     
@@ -27,6 +26,7 @@ struct PlayingDetailView: View {
                 fullScreenTextsAndControllers()
                 Spacer()
             }
+            
         }.transition(AnyTransition.move(edge: .bottom))
     }
 }
@@ -154,7 +154,7 @@ extension PlayingDetailView {
                         .id(nasheed.id)
                     
                     
-                    PlayControllerView(isPlaying: $isPlaying, nasheed: nasheed)
+                    PlayControllerView(nasheed: nasheed)
                         .padding(.top)
                 }
                 .padding(.top, 20)

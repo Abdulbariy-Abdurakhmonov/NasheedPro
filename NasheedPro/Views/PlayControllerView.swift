@@ -11,7 +11,7 @@ import SwiftUI
 
 struct PlayControllerView: View {
     
-    @Binding var isPlaying: Bool
+//    @Binding var isPlaying: Bool
     @State private var isRepeating: Bool = false
     @StateObject var player = AudioPlayerManager.shared
     let haptic = HapticManager.shared
@@ -35,7 +35,7 @@ struct PlayControllerView: View {
 
 #Preview {
     NavigationStack {
-        PlayControllerView(isPlaying: .constant(false), nasheed: dev.mockData)
+        PlayControllerView(nasheed: dev.mockData)
     }.environmentObject(dev.nasheedVM)
     //        .preferredColorScheme(.dark)
 }
@@ -133,11 +133,10 @@ extension PlayControllerView {
                     }
                 }
                 
+                
                 Button {
-                    
                     guard let url = URL(string: nasheed.audio) else { return }
                     player.togglePlayPause(url: url)
-                    
                     
                 } label: { ControllButton(icon: player.isPlaying ? "pause.fill" : "play.fill", size: 35, color: primary) }
                 
