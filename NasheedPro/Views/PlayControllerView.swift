@@ -11,7 +11,11 @@ import SwiftUI
 
 struct PlayControllerView: View {
     
-//    @Binding var isPlaying: Bool
+
+    @State private var isRotating = false
+    @State private var isRepeatEnabled = false
+    
+    
     @State private var isRepeating: Bool = false
     @StateObject var player = AudioPlayerManager.shared
     let haptic = HapticManager.shared
@@ -170,7 +174,7 @@ extension PlayControllerView {
     private var lowerButtons: some View {
         HStack {
             Button {
-                isRepeating.toggle()
+                //
             }label: { ControllButton(icon: isRepeating ? "moon.zzz" : "moon.zzz.fill", size: 28, color: .secondary) }
 
             Spacer()
@@ -189,9 +193,19 @@ extension PlayControllerView {
             Spacer()
             
             Button {
-                isRepeating.toggle()
+                withAnimation(.easeInOut(duration: 0.2)) {
+                        isRepeatEnabled.toggle()
+                        isRotating = true }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {isRotating = false}
+                player.isRepeatEnabled = isRepeatEnabled
+                
             } label: {
-                ControllButton(icon: isRepeating ? "repeat" : "repeat.1", size: 28, color: .secondary)
+                    ControllButton(icon:isRepeatEnabled ? "repeat.1" : "repeat", size: 28,
+                                   color: isRepeatEnabled ? .accent.opacity(0.7): .secondary)
+//                    .rotationEffect(.degrees(isRotating ? 15 : 0))
+                    .scaleEffect(isRotating ? 1.2 : 1)
+                    .animation(.easeInOut(duration: 0.2), value: isRotating)
+
             }
         }
         .padding(.horizontal, 55)

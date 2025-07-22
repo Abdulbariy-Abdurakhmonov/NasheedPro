@@ -10,6 +10,10 @@ import AVFoundation
 
 class AudioPlayerManager: ObservableObject {
     
+    
+    @Published var isRepeatEnabled: Bool = false
+
+    
     @Published var timer: Timer?
     @Published var progress: Double = 0.0
     @Published var totalDuration: Double = 0
@@ -20,7 +24,6 @@ class AudioPlayerManager: ObservableObject {
     private var player: AVPlayer?
     
     @Published var isPlaying = true
-    //
     @Published var allNasheeds: [NasheedModel] = []
     @Published var currentIndex: Int = 0
 
@@ -110,7 +113,14 @@ class AudioPlayerManager: ObservableObject {
     
     func loadAndPlay(url: URL) {
         player?.pause()
+        
+        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
+        
         player = AVPlayer(url: url)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(playerDidFinishPlaying), name: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem)
+            
+        
         player?.play()
         isPlaying = true
         isPlayerReady = false
@@ -128,7 +138,6 @@ class AudioPlayerManager: ObservableObject {
             }
         }
         
-        
         Task {
             do {
                 if let duration = try await player?.currentItem?.asset.load(.duration) {
@@ -141,6 +150,7 @@ class AudioPlayerManager: ObservableObject {
                 print("Failed to load duration:", error)
             }
         }
+        
     }
     
     
@@ -199,6 +209,18 @@ class AudioPlayerManager: ObservableObject {
             }
         }
     }
+    
+    
+    
+    @objc private func playerDidFinishPlaying() {
+        if isRepeatEnabled {
+            player?.seek(to: .zero)
+            player?.play()
+        } else {
+            playNext()
+        }
+    }
+
     
     
 }

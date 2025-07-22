@@ -92,6 +92,7 @@ extension ListVIew {
                                 AudioPlayerManager.shared.onNasheedChange  = { newNasheed in
                                     withAnimation(.spring()) {
                                         selectedNasheed = newNasheed
+                                        AudioPlayerManager.shared.isRepeatEnabled = false
                                     }
                                 }
                                 withAnimation(.spring) {

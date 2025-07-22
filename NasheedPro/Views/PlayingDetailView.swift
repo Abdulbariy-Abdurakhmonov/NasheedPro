@@ -72,6 +72,7 @@ extension PlayingDetailView {
                 Button(action: {
                     AudioPlayerManager.shared.stop()
                     self.miniHandler.dismiss()
+                    AudioPlayerManager.shared.isRepeatEnabled = false
                 }) {
                     Image(systemName: "xmark")
                         .font(.system(size: 20))
