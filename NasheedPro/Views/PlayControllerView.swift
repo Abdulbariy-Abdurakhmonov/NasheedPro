@@ -11,7 +11,12 @@ import SwiftUI
 
 struct PlayControllerView: View {
     
-
+    
+    let sleepOptions: [TimeInterval] = [15 * 60, 30 * 60, 60 * 60] // in seconds
+    
+    
+    @State private var isSleepTimerActive = false
+    
     @State private var isRotating = false
     @State private var isRepeatEnabled = false
     
@@ -64,15 +69,11 @@ extension PlayControllerView {
                     let currentProgress = player.previewProgress ?? player.progress
                     let progressRatio = player.totalDuration > 0 ? currentProgress / player.totalDuration : 0
 
-
-                    // Custom Progress Bar
                     RoundedRectangle(cornerRadius: 2)
                         .fill(Color.red)
                         .frame(width: sliderWidth * progressRatio, height: 4)
                     
        
-                    
-                    // Custom SF Symbol Thumb (Draggable)
                     Image(systemName: "circle.fill")
                         .resizable()
                         .frame(width: 14, height: 14) // Adjust thumb size
@@ -171,19 +172,78 @@ extension PlayControllerView {
         
     }
     
+    @ViewBuilder
+    private func sleepButton(for duration: TimeInterval, label: String) -> some View {
+        Button(action: {
+            player.startSleepTimer(for: duration)
+        }) {
+            HStack {
+                Text(label)
+                Spacer()
+                if player.selectedSleepDuration == duration {
+                    Image(systemName: "checkmark")
+                        .tint(.green)
+                }
+            }
+        }
+    }
+
+    
     private var lowerButtons: some View {
         HStack {
-            Button {
-                //
-            }label: { ControllButton(icon: isRepeating ? "moon.zzz" : "moon.zzz.fill", size: 28, color: .secondary) }
 
+                Menu {
+                    if player.isSleepTimerActive {
+                        Button("Cancel Timer", role: .destructive) {
+                            player.cancelSleepTimer()
+                        }
+                    }
+                    
+                        sleepButton(for: 30 * 60, label: "30 Minutes")
+                        sleepButton(for: 15 * 60, label: "15 Minutes")
+                        sleepButton(for: 0.16 * 60, label: "10 Seconds")
+                    
+                    
+                    
+                    
+                } label: {
+                    
+                        ControllButton(icon: player.isSleepTimerActive ? "moon.zzz.fill" : "moon.zzz", size: 28, color: player.isSleepTimerActive ? .accent.opacity(0.7) : .secondary)
+                        .animation(.spring(response: 0.5, dampingFraction: 0.7), value: player.isSleepTimerActive)
+                }
+                
+                
+                    .overlay {
+                       
+                        if player.isSleepTimerActive, let remaining = player.remainingSleepTime {
+                               Text(player.formatTime(remaining))
+                                   .font(.caption2)
+                                   .padding(4)
+                                   .background(Color.red.opacity(0.9))
+                                   .foregroundColor(.white)
+                                   .clipShape(Capsule())
+                                   .offset(x: 20, y: -20)
+
+                            
+                                   .transition(
+                                    .asymmetric(
+                                        insertion: .move(edge: .top).combined(with: .opacity).combined(with: .scale),
+                                        removal: AnyTransition.scale(scale: 0.1)
+                                            .combined(with: .opacity)
+                                            .combined(with: .offset(x: 10, y: -10))
+                                    )
+                                   )
+                            
+                           }
+                        
+                    }.animation(.spring(response: 0.4, dampingFraction: 0.7), value: player.isSleepTimerActive)
+                
+
+            
             Spacer()
             
-            
             Button {
-
                 viewModel.toggleLike(for: nasheed)
-                
             } label: {
                 ControllButton(
                 icon: nasheed.isLiked ? "heart.fill" : "heart",
@@ -207,6 +267,7 @@ extension PlayControllerView {
                     .animation(.easeInOut(duration: 0.2), value: isRotating)
 
             }
+            
         }
         .padding(.horizontal, 55)
     }

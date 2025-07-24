@@ -11,9 +11,19 @@ import AVFoundation
 class AudioPlayerManager: ObservableObject {
     
     
-    @Published var isRepeatEnabled: Bool = false
-
+    private var pendingSleepDuration: TimeInterval?
+    private var pausedSleepRemainingTime: TimeInterval?
+    private var sleepEndDate: Date?
     
+    @Published var countdownPaused = false
+    @Published var selectedSleepDuration: TimeInterval? = nil
+    @Published var countdownTimer: Timer?
+    @Published var sleepTimer: Timer?
+    @Published var remainingSleepTime: TimeInterval? = nil
+    @Published var isSleepTimerActive = false
+    
+    
+    @Published var isRepeatEnabled: Bool = false
     @Published var timer: Timer?
     @Published var progress: Double = 0.0
     @Published var totalDuration: Double = 0
@@ -30,21 +40,130 @@ class AudioPlayerManager: ObservableObject {
     
     var onNasheedChange: ((NasheedModel) -> Void)?
 
-    
-    func play(url: URL) {
-        if player?.currentItem?.asset as? AVURLAsset != AVURLAsset(url: url) {
-            // If different track, replace it
-            player = AVPlayer(url: url)
+    //go
+    func startSleepTimer(for duration: TimeInterval) {
+        cancelSleepTimer()
+        
+        selectedSleepDuration = duration
+        isSleepTimerActive = true
+        countdownPaused = true
+        remainingSleepTime = duration
+        pendingSleepDuration = duration
+        
+        if isPlaying {
+            sleepEndDate = Date().addingTimeInterval(duration)
+            updateRemainingTime()
+            beginCountdown()
+            countdownPaused = false
+            pendingSleepDuration = nil
         }
-        player?.play()
+    }
+    
+    //go
+    private func beginCountdown() {
+        guard let endDate = sleepEndDate else { return }
+
+        sleepTimer = Timer.scheduledTimer(withTimeInterval: endDate.timeIntervalSinceNow, repeats: false) { [weak self] _ in
+            self?.pause()
+            self?.cancelSleepTimer()
+        }
+
+        countdownTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            self?.updateRemainingTime()
+        }
+
+        countdownPaused = false
+    }
+
+    
+    
+
+    
+    //go
+     func cancelSleepTimer(keepState: Bool = false) {
+         sleepTimer?.invalidate()
+         countdownTimer?.invalidate()
+         sleepTimer = nil
+         countdownTimer = nil
+
+         if !keepState {
+             remainingSleepTime = nil
+             isSleepTimerActive = false
+             sleepEndDate = nil
+             selectedSleepDuration = nil
+             pausedSleepRemainingTime = nil
+             pendingSleepDuration = nil
+             countdownPaused = false
+         }
+     }
+
+     
+    
+    //go
+    private func updateRemainingTime() {
+           guard let endDate = sleepEndDate else { return }
+           let timeLeft = endDate.timeIntervalSinceNow
+           if timeLeft <= 0 {
+               remainingSleepTime = 0
+               cancelSleepTimer()
+           } else {
+               remainingSleepTime = timeLeft
+           }
+       }
+    
+    
+    
+    
+    @objc private func playerDidFinishPlaying() {
+        if isRepeatEnabled {
+            player?.seek(to: .zero)
+            player?.play()
+        } else {
+            playNext()
+        }
+    }
+    
+
+    
+    func play(player: AVPlayer) {
+        player.play()
         isPlaying = true
+        
+        
+        if isSleepTimerActive {
+            if countdownPaused {
+                
+                // go
+                if let pending = pendingSleepDuration {
+                    sleepEndDate = Date().addingTimeInterval(pending)
+                    pendingSleepDuration = nil
+                } else if let remaining = pausedSleepRemainingTime {
+                    sleepEndDate = Date().addingTimeInterval(remaining)
+                }
+                
+                beginCountdown()
+                countdownPaused = false
+            }
+        }
     }
     
     
     func pause() {
         player?.pause()
         isPlaying = false
+        timer?.invalidate()
+        
+        // go
+        if isSleepTimerActive && !countdownPaused {
+               pausedSleepRemainingTime = sleepEndDate?.timeIntervalSinceNow
+               cancelSleepTimer(keepState: true)
+               countdownPaused = true
+           }
+        
     }
+    
+    
+    
     
     
     func stop() {
@@ -154,20 +273,16 @@ class AudioPlayerManager: ObservableObject {
     }
     
     
-    
     func seek(to time: Double) {
         let cmTime = CMTime(seconds: time, preferredTimescale: 1)
         player?.seek(to: cmTime)
         progress = time
     }
     
+    
     func togglePlayPause(url: URL) {
         if isPlaying {
-            // Pause everything
-            player?.pause()
-            timer?.invalidate()
-            isPlaying = false
-            
+            pause()
         } else {
             if let currentAsset = player?.currentItem?.asset as? AVURLAsset {
                 if currentAsset.url != url {
@@ -175,12 +290,14 @@ class AudioPlayerManager: ObservableObject {
                     progress = 0 // reset progress for new track
                 }
             } else {
+                
                 player = AVPlayer(url: url)
             }
             
-            // Start playback
-            player?.play()
-            isPlaying = true
+            if let player = player {
+                play(player: player)
+            }
+            
             
             Task {
                 do {
@@ -210,16 +327,6 @@ class AudioPlayerManager: ObservableObject {
         }
     }
     
-    
-    
-    @objc private func playerDidFinishPlaying() {
-        if isRepeatEnabled {
-            player?.seek(to: .zero)
-            player?.play()
-        } else {
-            playNext()
-        }
-    }
 
     
     
