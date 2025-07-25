@@ -31,7 +31,7 @@ import SwiftUI
 
 final class NasheedModel: Identifiable, ObservableObject, Codable {
     var id = UUID().uuidString
-    var reciter: String
+    var reciter: String // 
     var nasheed: String
     var image: String
     var audio: String

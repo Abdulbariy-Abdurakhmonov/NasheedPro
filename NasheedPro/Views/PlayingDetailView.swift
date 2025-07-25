@@ -73,7 +73,7 @@ extension PlayingDetailView {
                     AudioPlayerManager.shared.stop()
                     self.miniHandler.dismiss()
                     AudioPlayerManager.shared.isRepeatEnabled = false
-                    AudioPlayerManager.shared.cancelSleepTimer()
+                    AudioPlayerManager.shared.sleepTimer.cancelSleepTimer()
                 }) {
                     Image(systemName: "xmark")
                         .font(.system(size: 20))
@@ -156,7 +156,7 @@ extension PlayingDetailView {
                         .id(nasheed.id)
                     
                     
-                    PlayControllerView(nasheed: nasheed)
+                    PlayControllerView(sleepTManager: AudioPlayerManager.shared.sleepTimer, nasheed: nasheed)
                         .padding(.top)
                 }
                 .padding(.top, 20)

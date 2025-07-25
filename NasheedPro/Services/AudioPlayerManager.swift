@@ -9,19 +9,7 @@ import Foundation
 import AVFoundation
 
 class AudioPlayerManager: ObservableObject {
-    
-    
-    private var pendingSleepDuration: TimeInterval?
-    private var pausedSleepRemainingTime: TimeInterval?
-    private var sleepEndDate: Date?
-    
-    @Published var countdownPaused = false
-    @Published var selectedSleepDuration: TimeInterval? = nil
-    @Published var countdownTimer: Timer?
-    @Published var sleepTimer: Timer?
-    @Published var remainingSleepTime: TimeInterval? = nil
-    @Published var isSleepTimerActive = false
-    
+        
     
     @Published var isRepeatEnabled: Bool = false
     @Published var timer: Timer?
@@ -29,7 +17,8 @@ class AudioPlayerManager: ObservableObject {
     @Published var totalDuration: Double = 0
     @Published var previewProgress: Double? = nil
     @Published var isPlayerReady: Bool = false
-
+    
+    let sleepTimer = SleepTimerManager()
     static let shared = AudioPlayerManager()
     private var player: AVPlayer?
     
@@ -39,77 +28,20 @@ class AudioPlayerManager: ObservableObject {
 
     
     var onNasheedChange: ((NasheedModel) -> Void)?
-
-    //go
-    func startSleepTimer(for duration: TimeInterval) {
-        cancelSleepTimer()
-        
-        selectedSleepDuration = duration
-        isSleepTimerActive = true
-        countdownPaused = true
-        remainingSleepTime = duration
-        pendingSleepDuration = duration
-        
-        if isPlaying {
-            sleepEndDate = Date().addingTimeInterval(duration)
-            updateRemainingTime()
-            beginCountdown()
-            countdownPaused = false
-            pendingSleepDuration = nil
-        }
-    }
     
-    //go
-    private func beginCountdown() {
-        guard let endDate = sleepEndDate else { return }
-
-        sleepTimer = Timer.scheduledTimer(withTimeInterval: endDate.timeIntervalSinceNow, repeats: false) { [weak self] _ in
+    
+    
+    
+    init() {
+        sleepTimer.onSleepTimeout = { [weak self] in
             self?.pause()
-            self?.cancelSleepTimer()
         }
-
-        countdownTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            self?.updateRemainingTime()
+        
+        sleepTimer.isPlaying = { [weak self] in
+             self?.isPlaying == true
         }
-
-        countdownPaused = false
     }
-
     
-    
-
-    
-    //go
-     func cancelSleepTimer(keepState: Bool = false) {
-         sleepTimer?.invalidate()
-         countdownTimer?.invalidate()
-         sleepTimer = nil
-         countdownTimer = nil
-
-         if !keepState {
-             remainingSleepTime = nil
-             isSleepTimerActive = false
-             sleepEndDate = nil
-             selectedSleepDuration = nil
-             pausedSleepRemainingTime = nil
-             pendingSleepDuration = nil
-             countdownPaused = false
-         }
-     }
-
-     
-    
-    //go
-    private func updateRemainingTime() {
-           guard let endDate = sleepEndDate else { return }
-           let timeLeft = endDate.timeIntervalSinceNow
-           if timeLeft <= 0 {
-               remainingSleepTime = 0
-               cancelSleepTimer()
-           } else {
-               remainingSleepTime = timeLeft
-           }
-       }
     
     
     
@@ -124,27 +56,11 @@ class AudioPlayerManager: ObservableObject {
     }
     
 
-    
     func play(player: AVPlayer) {
         player.play()
         isPlaying = true
         
-        
-        if isSleepTimerActive {
-            if countdownPaused {
-                
-                // go
-                if let pending = pendingSleepDuration {
-                    sleepEndDate = Date().addingTimeInterval(pending)
-                    pendingSleepDuration = nil
-                } else if let remaining = pausedSleepRemainingTime {
-                    sleepEndDate = Date().addingTimeInterval(remaining)
-                }
-                
-                beginCountdown()
-                countdownPaused = false
-            }
-        }
+        sleepTimer.playTriggered()
     }
     
     
@@ -153,17 +69,8 @@ class AudioPlayerManager: ObservableObject {
         isPlaying = false
         timer?.invalidate()
         
-        // go
-        if isSleepTimerActive && !countdownPaused {
-               pausedSleepRemainingTime = sleepEndDate?.timeIntervalSinceNow
-               cancelSleepTimer(keepState: true)
-               countdownPaused = true
-           }
-        
+        sleepTimer.pauseTriggered()
     }
-    
-    
-    
     
     
     func stop() {
@@ -239,12 +146,10 @@ class AudioPlayerManager: ObservableObject {
         
         NotificationCenter.default.addObserver(self, selector: #selector(playerDidFinishPlaying), name: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem)
             
-        
         player?.play()
         isPlaying = true
         isPlayerReady = false
         
-        // Reset and start timer
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             guard let self = self else { return }
