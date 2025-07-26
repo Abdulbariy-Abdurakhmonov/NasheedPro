@@ -234,10 +234,14 @@ extension PlayControllerView {
             Button {
                 viewModel.toggleLike(for: nasheed)
             } label: {
-                ControllButton(
-                icon: nasheed.isLiked ? "heart.fill" : "heart",
-                size: 28,
-                color: nasheed.isLiked ? .pink : .secondary) }
+//                ControllButton(icon: nasheed.isLiked ? "heart.fill" : "heart", size: 28,
+//                    color: nasheed.isLiked ? .pink : .secondary)
+                
+                LikeButtonView(isLiked: $nasheed.isLiked, size: 28)
+                    
+                    
+                
+            }
             
             Spacer()
             
