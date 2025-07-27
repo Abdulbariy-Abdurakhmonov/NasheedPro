@@ -10,9 +10,12 @@ import SwiftUI
 struct LikeButtonView: View {
     @Binding var isLiked: Bool
     let size: CGFloat
+    
     @State private var heartStyle: AnyShapeStyle = AnyShapeStyle(Color.gray)
     @State private var animate = false
     @State private var wasTapped = false
+    
+    let tapAction: () -> Void
 
     
     var body: some View {
@@ -23,10 +26,10 @@ struct LikeButtonView: View {
             .onTapGesture {
                 wasTapped = true
                 if !isLiked {
-                    isLiked = true
+                    tapAction()
                     triggerLikeAnimation()
                 } else {
-                    isLiked = false
+                    tapAction()
                     heartStyle = AnyShapeStyle(Color.gray)
                 }
             }
@@ -35,10 +38,10 @@ struct LikeButtonView: View {
             }
             .onChange(of: isLiked) { _, newValue in
                 if wasTapped {
-                    wasTapped = false // Reset for next tap
+                    wasTapped = false
                     return // Already handled via tap
                 }
-                // External change (like navigation)
+                
                 heartStyle = newValue ? AnyShapeStyle(Color.red) : AnyShapeStyle(Color.gray)
             }
             .animation(.easeOut(duration: 0.3), value: animate)
@@ -80,5 +83,5 @@ struct LikeButtonView: View {
 
 
 #Preview {
-    LikeButtonView(isLiked: .constant(false), size: 28)
+    LikeButtonView(isLiked: .constant(false), size: 28, tapAction: ({}))
 }
