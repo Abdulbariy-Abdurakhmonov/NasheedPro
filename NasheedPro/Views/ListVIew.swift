@@ -68,19 +68,7 @@ extension ListVIew {
         }
         
     }
-    
-    private var noSearchResultsView: some View {
-        withAnimation(.spring(duration: 0.3)) {
-            VStack {
-                Spacer()
-                Label("No results found", systemImage: "magnifyingglass")
-                    .font(.title3)
-                    .foregroundColor(.secondary)
-                Spacer()}
-            .transition(.opacity)
-        }
-    }
-    
+        
     private var listParts: some View {
         withAnimation(.spring(duration: 0.3)) {
             List {
@@ -94,7 +82,6 @@ extension ListVIew {
                                 AudioPlayerManager.shared.onNasheedChange  = { newNasheed in
                                     withAnimation(.spring()) {
                                         viewModel.selectedNasheed = newNasheed
-//                                        newNasheed = selectedNasheed
                                         AudioPlayerManager.shared.isRepeatEnabled = false
                                     }
                                 }
@@ -134,7 +121,7 @@ extension ListVIew {
                         contentUnavailableView()
                         .transition(.opacity)}
                 } else if viewModel.filteredNasheeds.isEmpty && !viewModel.searchText.isEmpty {
-                    noSearchResultsView
+                    UnavailableView(searchResult: viewModel.searchText)
                 } else {
                     listParts
                 }
