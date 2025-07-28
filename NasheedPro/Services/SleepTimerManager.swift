@@ -19,9 +19,6 @@ class SleepTimerManager: ObservableObject {
 //    static let shared = SleepTimerManager()
     
 
-    
-
-//     Inject pause/play closures
     var onSleepTimeout: (() -> Void)?
     var isPlaying: (() -> Bool)?
     

@@ -3,6 +3,7 @@
 //  NasheedPro
 //  Created by Abdulboriy on 30/06/25.
 //
+//    @ObservedObject var nasheed: NasheedModel class related
 
 import SwiftUI
 import MinimizableView
@@ -11,7 +12,8 @@ struct PlayingDetailView: View {
     
     @EnvironmentObject var miniHandler: MinimizableViewHandler
     @EnvironmentObject var viewModel: NasheedViewModel
-    @ObservedObject var nasheed: NasheedModel
+
+//    @Binding var nasheed: NasheedModel
     var animationNamespaceId: Namespace.ID
     
     
@@ -33,15 +35,15 @@ struct PlayingDetailView: View {
 
 
 //MARK: - Preview
-#Preview {
-    @Previewable @Namespace var previewNamespace
-    NavigationStack {
-        PlayingDetailView(nasheed: dev.mockData, animationNamespaceId: previewNamespace)
-    }
-    .environmentObject(dev.nasheedVM)
-    .environmentObject(MinimizableViewHandler())
-    
-}
+//#Preview {
+//    @Previewable @Namespace var previewNamespace
+//    NavigationStack {
+//        PlayingDetailView(nasheed: dev.mockData, animationNamespaceId: previewNamespace)
+//    }
+//    .environmentObject(dev.nasheedVM)
+//    .environmentObject(MinimizableViewHandler())
+//    
+//}
 
 
 
@@ -107,30 +109,40 @@ extension PlayingDetailView {
       }
     
     private func imageView(proxy: GeometryProxy) -> some View {
-        Image(nasheed.image)
+        Image(viewModel.selectedNasheed?.image  ?? "" )
             .resizable()
             .aspectRatio(contentMode: .fill)
             .frame(width: self.imageSize(proxy: proxy), height: self.imageSize(proxy: proxy))
             .cornerRadius(30)
+    }
+    var nasheedName: String {
+        viewModel.selectedNasheed?.nasheed ?? ""
+    }
+    var reciter: String {
+        viewModel.selectedNasheed?.reciter ?? ""
+    }
+    
+    var nasheedID: String {
+        viewModel.selectedNasheed?.id ?? ""
     }
     
     private func miniControllerView() -> some View {
         HStack {
             VStack(alignment: .leading) {
                 Spacer()
-                MarqueeText(text: nasheed.nasheed, font: .system(size: 23.5, weight: .regular))
-                    .matchedGeometryEffect(id: nasheed.nasheed, in: animationNamespaceId)
+                MarqueeText(text: nasheedName, font: .system(size: 23.5, weight: .regular))
+                    .matchedGeometryEffect(id: nasheedName, in: animationNamespaceId)
                     .fontDesign(.serif)
-                Text(nasheed.reciter)
+                Text(reciter)
                     .font(.headline)
                     .fontDesign(.serif)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: true, vertical: false)
-                    .matchedGeometryEffect(id: nasheed.reciter, in: animationNamespaceId)
+                    .matchedGeometryEffect(id: reciter, in: animationNamespaceId)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             Spacer(minLength: 0)
-            MinimizedController(nasheed: nasheed, player: AudioPlayerManager.shared)
+            MinimizedController(player: AudioPlayerManager.shared)
                 .padding(.trailing, 16)
                 .frame(width: 100)
                 .padding(.leading, 6)
@@ -141,22 +153,21 @@ extension PlayingDetailView {
         Group {
             if !miniHandler.isMinimized {
                 VStack {
-                    AnimatedText(text: nasheed.nasheed, font: .title, delay: 0.02)
+                    AnimatedText(text: nasheedName, font: .title, delay: 0.02)
                         .fontDesign(.serif)
                         .lineLimit(1)
                         .truncationMode(.tail)
                         .padding(.horizontal)
-                        .id(nasheed.id)
+                        .id(nasheedID)
                     
-                    AnimatedText(text: nasheed.reciter, font: .title2, delay: 0.02)
+                    AnimatedText(text: reciter, font: .title2, delay: 0.02)
                         .fontDesign(.serif)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                         .truncationMode(.tail)
-                        .id(nasheed.id)
-                    
-                    
-                    PlayControllerView(sleepTManager: AudioPlayerManager.shared.sleepTimer, nasheed: nasheed)
+                        .id(nasheedID)
+    
+                    PlayControllerView()
                         .padding(.top)
                 }
                 .padding(.top, 20)

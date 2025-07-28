@@ -9,7 +9,8 @@ import SwiftUI
 
 struct NasheedRowView: View {
     
-    @ObservedObject var nasheed: NasheedModel
+//    @ObservedObject var nasheed: NasheedModel
+    let nasheed: NasheedModel
     
     
     var body: some View {

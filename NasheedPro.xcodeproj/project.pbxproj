@@ -15,9 +15,22 @@
 		9466E6EE2E0EF9D60088815E /* NasheedPro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NasheedPro.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		948C6AB42E31675A0039B555 /* Exceptions for "NasheedPro" folder in "NasheedPro" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 9466E6ED2E0EF9D60088815E /* NasheedPro */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		9466E6F02E0EF9D60088815E /* NasheedPro */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				948C6AB42E31675A0039B555 /* Exceptions for "NasheedPro" folder in "NasheedPro" target */,
+			);
 			path = NasheedPro;
 			sourceTree = "<group>";
 		};
@@ -269,6 +282,8 @@
 				DEVELOPMENT_TEAM = 8DZQN3LC5M;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NasheedPro/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -298,6 +313,8 @@
 				DEVELOPMENT_TEAM = 8DZQN3LC5M;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NasheedPro/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

@@ -86,8 +86,9 @@ extension MainView {
             miniHandler: self.miniHandler,
             miniViewBottomMargin: self.miniViewBottomMargin,
             content: {
-                if let nasheed = self.selectedNasheed {
-                    return AnyView(PlayingDetailView(nasheed: nasheed, animationNamespaceId: self.namespace))
+//                if let nasheed = self.selectedNasheed {
+                if let _ = viewModel.selectedNasheed {
+                    return AnyView(PlayingDetailView(animationNamespaceId: self.namespace))
                 } else {
                     return AnyView(EmptyView())
                 }

@@ -14,44 +14,47 @@ import SwiftUI
  */
 
 
-//struct NasheedModel: Identifiable, Codable {
-//    var id = UUID().uuidString
-//    var reciter: String
-//    var nasheed: String
-//    var image: String
-//    var audio: String
-//    var isLiked: Bool = false
-//    var isDownloaded: Bool = false
-//    
-//    private enum CodingKeys: String, CodingKey {
-//            case reciter, nasheed, image, audio
-//        }
-//    
-//}
-
-final class NasheedModel: Identifiable, ObservableObject, Codable {
+struct NasheedModel: Identifiable,Equatable, Codable {
     var id = UUID().uuidString
-    
-    var reciter: String //
+    var reciter: String
     var nasheed: String
     var image: String
     var audio: String
-    
-    @Published var isLiked: Bool = false
-    @Published var isDownloaded: Bool = false
+    var isLiked: Bool = false
+    var isDownloaded: Bool = false
     
     private enum CodingKeys: String, CodingKey {
-        case reciter, nasheed, image, audio
-    }
+            case reciter, nasheed, image, audio
+        }
     
-    init(id: String = UUID().uuidString, reciter: String, nasheed: String, image: String, audio: String, isLiked: Bool = false, isDownloaded: Bool = false) {
-        self.id = id
-        self.reciter = reciter
-        self.nasheed = nasheed
-        self.image = image
-        self.audio = audio
-        self.isLiked = isLiked
-        self.isDownloaded = isDownloaded
-        
-    }
 }
+
+
+
+
+//final class NasheedModel: Identifiable, ObservableObject, Codable {
+//    var id = UUID().uuidString
+//    
+//    var reciter: String //
+//    var nasheed: String
+//    var image: String
+//    var audio: String
+//    
+//    @Published var isLiked: Bool = false
+//    @Published var isDownloaded: Bool = false
+//    
+//    private enum CodingKeys: String, CodingKey {
+//        case reciter, nasheed, image, audio
+//    }
+//    
+//    init(id: String = UUID().uuidString, reciter: String, nasheed: String, image: String, audio: String, isLiked: Bool = false, isDownloaded: Bool = false) {
+//        self.id = id
+//        self.reciter = reciter
+//        self.nasheed = nasheed
+//        self.image = image
+//        self.audio = audio
+//        self.isLiked = isLiked
+//        self.isDownloaded = isDownloaded
+//        
+//    }
+//}

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 import AVFoundation
 
 class AudioPlayerManager: ObservableObject {
@@ -26,6 +27,7 @@ class AudioPlayerManager: ObservableObject {
     @Published var allNasheeds: [NasheedModel] = []
     @Published var currentIndex: Int = 0
 
+//    @EnvironmentObject var viewModel: NasheedViewModel
     
     var onNasheedChange: ((NasheedModel) -> Void)?
     
@@ -125,10 +127,10 @@ class AudioPlayerManager: ObservableObject {
     func loadAndPlay(nasheeds: [NasheedModel], index: Int) {
         guard nasheeds.indices.contains(index),
               let url = URL(string: nasheeds[index].audio) else { return }
-        
+                
         self.allNasheeds = nasheeds
         self.currentIndex = index
-//        self.currentNasheed = nasheeds[index] // if you keep this
+
         DispatchQueue.main.async {
             self.onNasheedChange?(nasheeds[index])
         }

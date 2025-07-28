@@ -87,11 +87,14 @@ extension ListVIew {
                 ForEach(nasheedsOf) { nasheed in
                     NasheedRowView(nasheed: nasheed)
                         .onTapGesture {
+                            viewModel.selectedNasheed = nasheed
+                            
                             if let index = nasheedsOf.firstIndex(where: { $0.id == nasheed.id }) {
                                 AudioPlayerManager.shared.loadAndPlay(nasheeds: nasheedsOf, index: index)
                                 AudioPlayerManager.shared.onNasheedChange  = { newNasheed in
                                     withAnimation(.spring()) {
-                                        selectedNasheed = newNasheed
+                                        viewModel.selectedNasheed = newNasheed
+//                                        newNasheed = selectedNasheed
                                         AudioPlayerManager.shared.isRepeatEnabled = false
                                     }
                                 }

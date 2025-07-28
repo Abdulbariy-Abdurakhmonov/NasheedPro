@@ -8,41 +8,48 @@
 import SwiftUI
 
 struct LikeButtonView: View {
-    @Binding var isLiked: Bool
+
     let size: CGFloat
+    @EnvironmentObject var viewModel: NasheedViewModel
     
     @State private var heartStyle: AnyShapeStyle = AnyShapeStyle(Color.gray)
     @State private var animate = false
     @State private var wasTapped = false
+    @State private var isLiked: Bool = false
     
     let tapAction: () -> Void
 
+   
     
     var body: some View {
-        Image(systemName: isLiked ? "heart.fill" : "heart")
+        Image(systemName: viewModel.selectedNasheed?.isLiked ?? false ? "heart.fill" : "heart")
             .font(.system(size: size))
             .foregroundStyle(heartStyle)
             .scaleEffect(animate ? 1.3 : 1.0)
             .onTapGesture {
                 wasTapped = true
-                if !isLiked {
-                    tapAction()
+                tapAction()
+                isLiked.toggle()
+                if isLiked { // !if
+                    
                     triggerLikeAnimation()
                 } else {
-                    tapAction()
+                    
                     heartStyle = AnyShapeStyle(Color.gray)
                 }
             }
             .onAppear {
+                isLiked = viewModel.selectedNasheed?.isLiked ?? false
                 heartStyle = isLiked ? AnyShapeStyle(Color.red) : AnyShapeStyle(Color.gray)
             }
-            .onChange(of: isLiked) { _, newValue in
+            .onChange(of: viewModel.selectedNasheed) { _, newValue in
+                isLiked = newValue?.isLiked ?? false
                 if wasTapped {
                     wasTapped = false
-                    return // Already handled via tap
+                    return 
                 }
                 
-                heartStyle = newValue ? AnyShapeStyle(Color.red) : AnyShapeStyle(Color.gray)
+                heartStyle = isLiked ? AnyShapeStyle(Color.red) : AnyShapeStyle(Color.gray)
             }
             .animation(.easeOut(duration: 0.3), value: animate)
     }
@@ -83,5 +90,5 @@ struct LikeButtonView: View {
 
 
 #Preview {
-    LikeButtonView(isLiked: .constant(false), size: 28, tapAction: ({}))
+    LikeButtonView(size: 28, tapAction: {})
 }

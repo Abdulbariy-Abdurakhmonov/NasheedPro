@@ -10,17 +10,17 @@ import SwiftUI
 
 struct MinimizedController: View {
     
-    let nasheed: NasheedModel
+//    let nasheed: NasheedModel
 //    @Binding var isPlaying: Bool
     @ObservedObject var player: AudioPlayerManager
-    
+    @EnvironmentObject var viewModel: NasheedViewModel
     var body: some View {
         HStack(spacing: 0){
             
             Spacer()
             
             Button(action: {
-                guard let url = URL(string: nasheed.audio) else { return }
+                guard let url = URL(string: viewModel.selectedNasheed?.audio ?? "") else { return }
                 AudioPlayerManager.shared.togglePlayPause(url: url)
                 
             }, label: {

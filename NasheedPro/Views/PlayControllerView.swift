@@ -12,19 +12,17 @@ import SwiftUI
 struct PlayControllerView: View {
     
     
-    let sleepOptions: [TimeInterval] = [15 * 60, 30 * 60, 60 * 60] // in seconds
+    let sleepOptions: [TimeInterval] = [10 * 60, 20 * 60, 30 * 60]
     
     @State private var isRotating = false
     @State private var isRepeatEnabled = false
     
-    @State private var isRepeating: Bool = false
+    @EnvironmentObject var viewModel: NasheedViewModel
+    
     @StateObject var player = AudioPlayerManager.shared
     let haptic = HapticManager.shared
-
-    @ObservedObject var sleepTManager: SleepTimerManager
-    @ObservedObject var nasheed: NasheedModel
     
-    @EnvironmentObject var viewModel: NasheedViewModel
+    
     
     var body: some View {
         VStack {
@@ -39,7 +37,7 @@ struct PlayControllerView: View {
 
 #Preview {
     NavigationStack {
-        PlayControllerView(sleepTManager: AudioPlayerManager.shared.sleepTimer, nasheed: dev.mockData)
+        PlayControllerView()
     }.environmentObject(dev.nasheedVM)
     //        .preferredColorScheme(.dark)
 }
@@ -52,14 +50,12 @@ extension PlayControllerView {
     private var sliderView: some View {
         VStack {
             GeometryReader { geometry in
-                let sliderWidth = geometry.size.width // Use full width
+                let sliderWidth = geometry.size.width
                 
                 ZStack(alignment: .leading) {
-                    // Custom Track
                     RoundedRectangle(cornerRadius: 2)
                         .fill(Color.gray.opacity(0.3))
                         .frame(height: 4)
-                    
                     
                     let currentProgress = player.previewProgress ?? player.progress
                     let progressRatio = player.totalDuration > 0 ? currentProgress / player.totalDuration : 0
@@ -71,7 +67,7 @@ extension PlayControllerView {
        
                     Image(systemName: "circle.fill")
                         .resizable()
-                        .frame(width: 14, height: 14) // Adjust thumb size
+                        .frame(width: 14, height: 14)
                         .foregroundColor(.red)
                         .offset(x: progressRatio * sliderWidth - 7 )
                         .gesture(
@@ -96,10 +92,10 @@ extension PlayControllerView {
                     let newProgress = min(max(0, location.x / sliderWidth * player.totalDuration), player.totalDuration)
                     player.seek(to: newProgress)
                     haptic.playSelection()
-                }//Zstack
+                }
                 
             }
-            .frame(height: 20) // Ensure enough space for the thumb
+            .frame(height: 20)
             timeLabel
         }
         .frame(height: 28)
@@ -135,7 +131,7 @@ extension PlayControllerView {
                 
                 
                 Button {
-                    guard let url = URL(string: nasheed.audio) else { return }
+                    guard let url = URL(string: viewModel.selectedNasheed?.audio ?? "") else { return }
                     player.togglePlayPause(url: url)
                     
                 } label: { ControllButton(icon: player.isPlaying ? "pause.fill" : "play.fill", size: 35, color: primary) }
@@ -163,86 +159,18 @@ extension PlayControllerView {
             
             .padding(.vertical, 26)
             .padding(.bottom, 28)
-   
-        
     }
-    
-    @ViewBuilder
-    private func sleepButton(for duration: TimeInterval, label: String) -> some View {
-        Button(action: {
-            sleepTManager.startSleepTimer(for: duration)
-        }) {
-            HStack {
-                Text(label)
-                Spacer()
-                if sleepTManager.selectedSleepDuration == duration {
-                    Image(systemName: "checkmark")
-                        .tint(.accent)
-                }
-            }
-        }
-    }
-
     
     private var lowerButtons: some View {
         HStack {
-                Menu {
-                    if sleepTManager.isSleepTimerActive {
-                        Button("Cancel Timer", role: .destructive) {
-                            sleepTManager.cancelSleepTimer()
-                        }
-                    }
-                        sleepButton(for: 30 * 60, label: "30 Minutes")
-                        sleepButton(for: 15 * 60, label: "15 Minutes")
-                        sleepButton(for: 0.16 * 60, label: "10 Seconds")
-                } label: {
-                    
-                    ControllButton(icon: sleepTManager.isSleepTimerActive ? "moon.zzz.fill" : "moon.zzz", size: 28, color: sleepTManager.isSleepTimerActive ? .accent.opacity(0.7) : .secondary)
-                        .animation(.spring(response: 0.5, dampingFraction: 0.7), value: sleepTManager.isSleepTimerActive)
-                }
-                
-                
-                    .overlay {
-                       
-                        if sleepTManager.isSleepTimerActive, let remaining = sleepTManager.remainingSleepTime {
-                               Text(player.formatTime(remaining))
-                                   .font(.caption2)
-                                   .padding(4)
-                                   .background(Color.red.opacity(0.9))
-                                   .foregroundColor(.white)
-                                   .clipShape(Capsule())
-                                   .offset(x: 20, y: -20)
-
-                            
-                                   .transition(
-                                    .asymmetric(
-                                        insertion: .move(edge: .top).combined(with: .opacity).combined(with: .scale),
-                                        removal: AnyTransition.scale(scale: 0.1)
-                                            .combined(with: .opacity)
-                                            .combined(with: .offset(x: 10, y: -10))
-                                    )
-                                   )
-                            
-                           }
-                        
-                    }.animation(.spring(response: 0.4, dampingFraction: 0.7), value: sleepTManager.isSleepTimerActive)
-                
-
-            
+            SleepTimerButton(sleepTManager: AudioPlayerManager.shared.sleepTimer)
             Spacer()
-            
-//            Button {
-//                print("Like button tapped for \(nasheed.id)")
-//                viewModel.toggleLike(for: nasheed)
-//            } label: {
-//   
-//                LikeButtonView(isLiked: $nasheed.isLiked, size: 28)
-//            }
-            
-            LikeButtonView(isLiked: $nasheed.isLiked, size: 28) {
-                print("Like button tapped for \(nasheed.id)")
-                viewModel.toggleLike(for: nasheed)
+            LikeButtonView(size: 28) {
+                if let nasheed = viewModel.selectedNasheed {
+                    viewModel.toggleLike(for: nasheed)
+                }
             }
+            .environmentObject(viewModel)
             
             Spacer()
             
@@ -252,7 +180,6 @@ extension PlayControllerView {
                         isRotating = true }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {isRotating = false}
                 player.isRepeatEnabled = isRepeatEnabled
-                
             } label: {
                     ControllButton(icon:isRepeatEnabled ? "repeat.1" : "repeat", size: 28,
                                    color: isRepeatEnabled ? .accent.opacity(0.7): .secondary)
@@ -265,7 +192,5 @@ extension PlayControllerView {
         }
         .padding(.horizontal, 55)
     }
-    
-    
     
 }
