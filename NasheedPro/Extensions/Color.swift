@@ -36,6 +36,7 @@ struct ColorTheme {
     let background = Color("BackgroundColor")
     let accent = Color("AccentColor")
     let mainColor = Color("MainColor")
+    let launchBackgroundColor = Color("LaunchBackgroundColor")
     
     var hex: Color {
         .init(hex: "222831")

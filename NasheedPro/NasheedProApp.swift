@@ -13,14 +13,28 @@ struct NasheedProApp: App {
     
     @StateObject private var viewmodel = NasheedViewModel()
     @StateObject private var miniHandler = MinimizableViewHandler()
+    @State private var showLaunchView: Bool = true
     
     var body: some Scene {
         WindowGroup {
-            NavigationStack {
-                MainView()
+            ZStack {
+                NavigationStack {
+                    MainView()
+                }
+                .environmentObject(viewmodel)
+                .environmentObject(miniHandler)
+                
+                ZStack {
+                    if showLaunchView {
+                        LaunchView(showLaunchView: $showLaunchView)
+                            .transition(.move(edge: .leading))
+                    }
+                }
+                .zIndex(2.0)
+                
             }
-            .environmentObject(viewmodel)
-            .environmentObject(miniHandler)
+            
+            
             
         }
         
