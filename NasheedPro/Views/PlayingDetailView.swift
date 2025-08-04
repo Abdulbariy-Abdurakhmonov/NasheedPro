@@ -13,7 +13,6 @@ struct PlayingDetailView: View {
     @EnvironmentObject var miniHandler: MinimizableViewHandler
     @EnvironmentObject var viewModel: NasheedViewModel
 
-//    @Binding var nasheed: NasheedModel
     var animationNamespaceId: Namespace.ID
     
     
@@ -35,15 +34,15 @@ struct PlayingDetailView: View {
 
 
 //MARK: - Preview
-//#Preview {
-//    @Previewable @Namespace var previewNamespace
-//    NavigationStack {
-//        PlayingDetailView(nasheed: dev.mockData, animationNamespaceId: previewNamespace)
-//    }
-//    .environmentObject(dev.nasheedVM)
-//    .environmentObject(MinimizableViewHandler())
-//    
-//}
+#Preview {
+    @Previewable @Namespace var previewNamespace
+    NavigationStack {
+        PlayingDetailView(animationNamespaceId: previewNamespace)
+    }
+    .environmentObject(dev.nasheedVM)
+    .environmentObject(MinimizableViewHandler())
+    
+}
 
 
 
@@ -105,16 +104,17 @@ extension PlayingDetailView {
                   Spacer(minLength: 0)
               }
           }
-          .padding(.leading)
+        
+          .padding(.leading, miniHandler.isMinimized ? 16: 0)
       }
     
     private func imageView(proxy: GeometryProxy) -> some View {
-        Image(viewModel.selectedNasheed?.image  ?? "" )
-            .resizable()
-            .aspectRatio(contentMode: .fill)
+        ImageLoader(url: viewModel.selectedNasheed?.image ?? "")
             .frame(width: self.imageSize(proxy: proxy), height: self.imageSize(proxy: proxy))
             .cornerRadius(30)
     }
+    
+    
     var nasheedName: String {
         viewModel.selectedNasheed?.nasheed ?? ""
     }

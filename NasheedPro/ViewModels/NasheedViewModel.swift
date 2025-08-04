@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 //@MainActor
-class NasheedViewModel: ObservableObject {
+final class NasheedViewModel: ObservableObject {
     
     @Published var likedNasheeds: [NasheedModel] = []
     
