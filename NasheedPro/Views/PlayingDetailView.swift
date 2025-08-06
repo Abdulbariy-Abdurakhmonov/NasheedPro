@@ -109,14 +109,14 @@ extension PlayingDetailView {
       }
     
     private func imageView(proxy: GeometryProxy) -> some View {
-        ImageLoader(url: viewModel.selectedNasheed?.image ?? "")
+        ImageLoader(url: viewModel.selectedNasheed?.imageURL ?? "")
             .frame(width: self.imageSize(proxy: proxy), height: self.imageSize(proxy: proxy))
             .cornerRadius(30)
     }
     
     
     var nasheedName: String {
-        viewModel.selectedNasheed?.nasheed ?? ""
+        viewModel.selectedNasheed?.title ?? ""
     }
     var reciter: String {
         viewModel.selectedNasheed?.reciter ?? ""

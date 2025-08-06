@@ -15,14 +15,13 @@ struct NasheedRowView: View {
     
     var body: some View {
         HStack {
-//            Image("nasheedImage")
-            ImageLoader(url: nasheed.image)
+            ImageLoader(url: nasheed.imageURL)
                 .frame(width: 46, height: 46)
                 .cornerRadius(36)
                 .padding(.trailing, 10)
 
             VStack(alignment: .leading) {
-                Text(nasheed.nasheed)
+                Text(nasheed.title)
                     .font(.title3)
                     .fontDesign(.serif)
                     

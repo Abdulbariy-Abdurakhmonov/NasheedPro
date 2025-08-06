@@ -131,7 +131,7 @@ extension PlayControllerView {
                 
                 
                 Button {
-                    guard let url = URL(string: viewModel.selectedNasheed?.audio ?? "") else { return }
+                    guard let url = URL(string: viewModel.selectedNasheed?.audioURL ?? "") else { return }
                     player.togglePlayPause(url: url)
                     
                 } label: { ControllButton(icon: player.isPlaying ? "pause.fill" : "play.fill", size: 35, color: primary) }

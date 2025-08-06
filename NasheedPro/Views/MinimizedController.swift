@@ -20,7 +20,7 @@ struct MinimizedController: View {
             Spacer()
             
             Button(action: {
-                guard let url = URL(string: viewModel.selectedNasheed?.audio ?? "") else { return }
+                guard let url = URL(string: viewModel.selectedNasheed?.audioURL ?? "") else { return }
                 AudioPlayerManager.shared.togglePlayPause(url: url)
                 
             }, label: {

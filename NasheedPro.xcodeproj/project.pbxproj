@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		9442FA2C2E15B73B0021F880 /* MinimizableView in Frameworks */ = {isa = PBXBuildFile; productRef = 9442FA2B2E15B73B0021F880 /* MinimizableView */; };
+		94ACB0FD2E43D4E800CD8ED5 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 94ACB0FC2E43D4E800CD8ED5 /* FirebaseAnalytics */; };
+		94ACB0FF2E43D4E800CD8ED5 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 94ACB0FE2E43D4E800CD8ED5 /* FirebaseCore */; };
+		94ACB1012E43D4E800CD8ED5 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 94ACB1002E43D4E800CD8ED5 /* FirebaseFirestore */; };
+		94ACB1032E43D4E800CD8ED5 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 94ACB1022E43D4E800CD8ED5 /* FirebaseStorage */; };
 		94B5C65C2E1D789D00CC4D98 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 94B5C65B2E1D789D00CC4D98 /* SDWebImageSwiftUI */; };
 /* End PBXBuildFile section */
 
@@ -43,6 +47,10 @@
 			files = (
 				94B5C65C2E1D789D00CC4D98 /* SDWebImageSwiftUI in Frameworks */,
 				9442FA2C2E15B73B0021F880 /* MinimizableView in Frameworks */,
+				94ACB0FF2E43D4E800CD8ED5 /* FirebaseCore in Frameworks */,
+				94ACB1012E43D4E800CD8ED5 /* FirebaseFirestore in Frameworks */,
+				94ACB0FD2E43D4E800CD8ED5 /* FirebaseAnalytics in Frameworks */,
+				94ACB1032E43D4E800CD8ED5 /* FirebaseStorage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -87,6 +95,10 @@
 			packageProductDependencies = (
 				9442FA2B2E15B73B0021F880 /* MinimizableView */,
 				94B5C65B2E1D789D00CC4D98 /* SDWebImageSwiftUI */,
+				94ACB0FC2E43D4E800CD8ED5 /* FirebaseAnalytics */,
+				94ACB0FE2E43D4E800CD8ED5 /* FirebaseCore */,
+				94ACB1002E43D4E800CD8ED5 /* FirebaseFirestore */,
+				94ACB1022E43D4E800CD8ED5 /* FirebaseStorage */,
 			);
 			productName = NasheedPro;
 			productReference = 9466E6EE2E0EF9D60088815E /* NasheedPro.app */;
@@ -119,6 +131,7 @@
 			packageReferences = (
 				9442FA2A2E15B73B0021F880 /* XCRemoteSwiftPackageReference "MinimizableView" */,
 				94B5C65A2E1D789D00CC4D98 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+				94ACB0FB2E43D4E800CD8ED5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9466E6EF2E0EF9D60088815E /* Products */;
@@ -289,7 +302,9 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = Launching.storyboard;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -321,7 +336,9 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = Launching.storyboard;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -368,6 +385,14 @@
 				minimumVersion = 2.4.2;
 			};
 		};
+		94ACB0FB2E43D4E800CD8ED5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.1.0;
+			};
+		};
 		94B5C65A2E1D789D00CC4D98 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI.git";
@@ -383,6 +408,26 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9442FA2A2E15B73B0021F880 /* XCRemoteSwiftPackageReference "MinimizableView" */;
 			productName = MinimizableView;
+		};
+		94ACB0FC2E43D4E800CD8ED5 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 94ACB0FB2E43D4E800CD8ED5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		94ACB0FE2E43D4E800CD8ED5 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 94ACB0FB2E43D4E800CD8ED5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		94ACB1002E43D4E800CD8ED5 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 94ACB0FB2E43D4E800CD8ED5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		94ACB1022E43D4E800CD8ED5 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 94ACB0FB2E43D4E800CD8ED5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
 		};
 		94B5C65B2E1D789D00CC4D98 /* SDWebImageSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;

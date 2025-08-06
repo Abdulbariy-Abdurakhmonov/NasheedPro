@@ -126,7 +126,7 @@ class AudioPlayerManager: ObservableObject {
     
     func loadAndPlay(nasheeds: [NasheedModel], index: Int) {
         guard nasheeds.indices.contains(index),
-              let url = URL(string: nasheeds[index].audio) else { return }
+              let url = URL(string: nasheeds[index].audioURL) else { return }
                 
         self.allNasheeds = nasheeds
         self.currentIndex = index

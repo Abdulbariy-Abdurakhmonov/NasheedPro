@@ -7,13 +7,21 @@
 
 import SwiftUI
 import MinimizableView
+import FirebaseCore
+
 
 @main
 struct NasheedProApp: App {
-    
     @StateObject private var viewmodel = NasheedViewModel()
     @StateObject private var miniHandler = MinimizableViewHandler()
     @State private var showLaunchView: Bool = true
+    
+    
+    init() {
+        FirebaseApp.configure()
+        print("Configured Firebase")
+    }
+    
     
     var body: some Scene {
         WindowGroup {
@@ -33,9 +41,7 @@ struct NasheedProApp: App {
                 .zIndex(2.0)
                 
             }
-            
-            
-            
+
         }
         
     }
