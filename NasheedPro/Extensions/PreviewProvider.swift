@@ -13,7 +13,7 @@ class DeveloperPreview {
     
     static let instance = DeveloperPreview()
     private init() { }
-
+    
     let nasheedVM = NasheedViewModel()
     
     let mockData = NasheedModel(id: "", title: "", reciter: "", imageURL: "", audioURL: "", isLiked: false, isDownloaded: false)

@@ -39,7 +39,7 @@ struct PlayingDetailView: View {
     NavigationStack {
         PlayingDetailView(animationNamespaceId: previewNamespace)
     }
-    .environmentObject(dev.nasheedVM)
+    .environmentObject(NasheedViewModel())
     .environmentObject(MinimizableViewHandler())
     
 }

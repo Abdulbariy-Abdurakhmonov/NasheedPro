@@ -26,8 +26,6 @@ class AudioPlayerManager: ObservableObject {
     @Published var isPlaying = true
     @Published var allNasheeds: [NasheedModel] = []
     @Published var currentIndex: Int = 0
-
-//    @EnvironmentObject var viewModel: NasheedViewModel
     
     var onNasheedChange: ((NasheedModel) -> Void)?
     
@@ -134,50 +132,106 @@ class AudioPlayerManager: ObservableObject {
         DispatchQueue.main.async {
             self.onNasheedChange?(nasheeds[index])
         }
-
         loadAndPlay(url: url)
+        
     }
 
-    
+    //new trial
     func loadAndPlay(url: URL) {
+        // Stop any current playback
         player?.pause()
-        
-        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
-        
-        player = AVPlayer(url: url)
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(playerDidFinishPlaying), name: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem)
-            
-        player?.play()
-        isPlaying = true
-        isPlayerReady = false
-        
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            guard let self = self else { return }
-            if let currentTime = self.player?.currentTime() {
-                self.progress = CMTimeGetSeconds(currentTime)
-            }
-            if self.progress >= self.totalDuration {
-                self.timer?.invalidate()
-                self.isPlaying = false
-            }
-        }
+        isPlayerReady = false
+        progress = 0
+        totalDuration = 0
         
+        // Create a new player
+        let playerItem = AVPlayerItem(url: url)
+        player = AVPlayer(playerItem: playerItem)
+        
+        // Handle playback finished
+        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(playerDidFinishPlaying),
+            name: .AVPlayerItemDidPlayToEndTime,
+            object: playerItem
+        )
+        
+        // Load duration asynchronously before starting
         Task {
             do {
-                if let duration = try await player?.currentItem?.asset.load(.duration) {
-                    await MainActor.run { [weak self] in
-                        self?.totalDuration = CMTimeGetSeconds(duration)
-                        self?.isPlayerReady = true
-                    }
+                let duration = try await playerItem.asset.load(.duration)
+                await MainActor.run { [weak self] in
+                    guard let self = self else { return }
+                    self.totalDuration = CMTimeGetSeconds(duration)
+                    self.isPlayerReady = true
+                    self.isPlaying = true // update BEFORE starting playback so UI updates instantly
+                    self.player?.play()
                 }
             } catch {
                 print("Failed to load duration:", error)
             }
         }
         
+
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            if let currentTime = self.player?.currentTime() {
+                self.progress = CMTimeGetSeconds(currentTime)
+            }
+            if self.progress >= self.totalDuration, self.totalDuration > 0 {
+                self.timer?.invalidate()
+                self.isPlaying = false
+            }
+        }
     }
+
+
+
+    
+    
+//    func loadAndPlay(url: URL) {
+//        player?.pause()
+//        
+//        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
+//        
+//        player = AVPlayer(url: url)
+//        
+//        NotificationCenter.default.addObserver(self, selector: #selector(playerDidFinishPlaying), name: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem)
+//            
+//        player?.play()
+//        DispatchQueue.main.async { [weak self] in
+//            self?.isPlaying = true
+//        }
+//        isPlayerReady = false
+//        
+//        timer?.invalidate()
+//        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+//            guard let self = self else { return }
+//            if let currentTime = self.player?.currentTime() {
+//                self.progress = CMTimeGetSeconds(currentTime)
+//            }
+//            if self.progress >= self.totalDuration {
+//                self.timer?.invalidate()
+//                self.isPlaying = false
+//            }
+//        }
+//        
+//        Task {
+//            do {
+//                if let duration = try await player?.currentItem?.asset.load(.duration) {
+//                    await MainActor.run { [weak self] in
+//                        self?.totalDuration = CMTimeGetSeconds(duration)
+//                        self?.isPlayerReady = true
+//                    }
+//                }
+//            } catch {
+//                print("Failed to load duration:", error)
+//            }
+//        }
+//        
+//    }
     
     
     func seek(to time: Double) {

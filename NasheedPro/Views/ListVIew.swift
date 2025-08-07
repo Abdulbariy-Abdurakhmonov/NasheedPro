@@ -57,7 +57,7 @@ extension ListVIew {
                 Button("Search by Reciter Name") {
                     viewModel.searchMode = .reciter }
                 Button("Search by Nasheed Name") {
-                    viewModel.searchMode = .nasheed }
+                    viewModel.searchMode = .title }
             } label: {
                 HStack {
                     Image(systemName: "magnifyingglass")
@@ -68,28 +68,36 @@ extension ListVIew {
         }
         
     }
-        
+    
     private var listParts: some View {
         withAnimation(.spring(duration: 0.3)) {
             List {
                 ForEach(nasheedsOf) { nasheed in
                     NasheedRowView(nasheed: nasheed)
+                    
                         .onTapGesture {
-                            viewModel.selectedNasheed = nasheed
                             
-                            if let index = nasheedsOf.firstIndex(where: { $0.id == nasheed.id }) {
-                                AudioPlayerManager.shared.loadAndPlay(nasheeds: nasheedsOf, index: index)
-                                AudioPlayerManager.shared.onNasheedChange  = { newNasheed in
-                                    withAnimation(.spring()) {
-                                        viewModel.selectedNasheed = newNasheed
-                                        AudioPlayerManager.shared.isRepeatEnabled = false
+                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                            
+                            DispatchQueue.main.async {
+                                viewModel.selectedNasheed = nasheed
+                                
+                                
+                                if let index = nasheedsOf.firstIndex(where: { $0.id == nasheed.id }) {
+                                    AudioPlayerManager.shared.loadAndPlay(nasheeds: nasheedsOf, index: index)
+                                    AudioPlayerManager.shared.onNasheedChange  = { newNasheed in
+                                        withAnimation(.spring()) {
+                                            viewModel.selectedNasheed = newNasheed
+                                            AudioPlayerManager.shared.isRepeatEnabled = false
+                                        }
                                     }
-                                }
-                                withAnimation(.spring) {
-                                    if self.miniHandler.isPresented {
-                                        self.miniHandler.expand()
-                                    } else {
-                                        self.miniHandler.present()
+                                    
+                                    withAnimation(.spring) {
+                                        if self.miniHandler.isPresented {
+                                            self.miniHandler.expand()
+                                        } else {
+                                            self.miniHandler.present()
+                                        }
                                     }
                                 }
                             }

@@ -20,10 +20,11 @@ struct MainView: View {
     var body: some View {
         tabViews
         .task {
-            await viewModel.loadNasheeds()
+             viewModel.loadNasheeds()
             }
         .onAppear {
             miniVM.setHandler(miniHandler)
+            miniHandler.isPresented = false
         }
     }
 }

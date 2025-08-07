@@ -39,7 +39,6 @@ struct PlayControllerView: View {
     NavigationStack {
         PlayControllerView()
     }.environmentObject(dev.nasheedVM)
-    //        .preferredColorScheme(.dark)
 }
 
 
