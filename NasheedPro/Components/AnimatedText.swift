@@ -7,68 +7,72 @@
 
 import SwiftUI
 
-//struct AnimatedText: View {
-//    let text: String
-//    let font: Font
-//    let delay: Double
-//    
-//    @State private var visibleCharacters: Int = 0
-//
-//    
-//    var body: some View {
-//        HStack(spacing: 0) {
-//            
-//            
-//            ForEach(Array(text.enumerated()), id: \.offset) { index, char in
-//                Text(String(char))
-//                    .font(font)
-//                    .opacity(index < visibleCharacters ? 1 : 0)
-//                    .animation(.easeOut.delay(Double(index) * delay), value: visibleCharacters)
-//            }
-//            
-//        }
-//        .onAppear {
-//            visibleCharacters = text.count
-//        }
-//        .onChange(of: text) { _, newValue in
-//            visibleCharacters = 0
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { // 0.8 is good
-//                visibleCharacters = newValue.count
-//            }
-//        }
-//        
-//    }
-//}
-
 struct AnimatedText: View {
     let text: String
+    let font: Font
     let delay: Double
-    let size: CGFloat
-    
+    let maxCharsPerLine: Int
+
     @State private var visibleCharacters: Int = 0
-   
-    
+    @State private var isTwoLines: Bool = false
+
     var body: some View {
-        // Wrap everything in a single Text container so wrapping works
-        Text(composedText)
-            .scaledFont(name: "Serif", size: size)
-            .fontDesign(.serif)
-            .multilineTextAlignment(.center)
-            .lineLimit(2) // ✅ allow 2 lines
-//            .minimumScaleFactor(dynamicTypeSize.customMinScaleFactor)
-            .onAppear {
-                visibleCharacters = text.count
-            }
-            .onChange(of: text) { _, newValue in
-                visibleCharacters = 0
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                    visibleCharacters = newValue.count
+        Group {
+            if isTwoLines {
+                VStack(alignment: .center, spacing: 0) {
+                    textLine(0)
+                    textLine(1)
                 }
+            } else {
+                textLine(0)
             }
+        }
+        .onAppear {
+            visibleCharacters = text.count
+            checkTwoLines()
+        }
+        .onChange(of: text) { _, newValue in
+            visibleCharacters = 0
+            checkTwoLines()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                visibleCharacters = newValue.count
+            }
+        }
     }
-    
-    private var composedText: String {
-        String(text.prefix(visibleCharacters))
+
+    private func textLine(_ lineIndex: Int) -> some View {
+        let words = text.split(separator: " ")
+      
+        var firstLine = ""
+        var secondLine = ""
+        
+        for word in words {
+            if (firstLine + (firstLine.isEmpty ? "" : " ") + word).count <= maxCharsPerLine {
+                firstLine += (firstLine.isEmpty ? "" : " ") + word
+            } else {
+                secondLine += (secondLine.isEmpty ? "" : " ") + word
+            }
+        }
+
+        let lineText = (lineIndex == 0) ? firstLine : secondLine
+        
+        let start = (lineIndex == 0) ? 0 : firstLine.count
+        let _ = start + lineText.count
+
+        return HStack(spacing: 0) {
+            ForEach(Array(lineText.enumerated()), id: \.offset) { index, char in
+                let globalIndex = start + index
+                Text(String(char))
+                    .font(font)
+                    .opacity(globalIndex < visibleCharacters ? 1 : 0)
+                    .animation(.easeOut.delay(Double(globalIndex) * delay), value: visibleCharacters)
+            }
+        }
+    }
+
+    // Decide if text should be split into 2 lines
+    private func checkTwoLines() {
+        isTwoLines = text.count > maxCharsPerLine
     }
 }
 
@@ -76,6 +80,7 @@ struct AnimatedText: View {
 
 
 
+
 #Preview {
-    AnimatedText(text: "This is very long nasheed test text to be tested", delay: 0.3, size: 35)
+    AnimatedText(text: "This is very long nasheed to be tested", font: .title, delay: 0.02, maxCharsPerLine: 25)
 }

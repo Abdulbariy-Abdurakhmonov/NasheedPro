@@ -171,17 +171,18 @@ extension PlayingDetailView {
             if !miniHandler.isMinimized {
                 VStack {
                     
-                    VStack(alignment: .center, spacing: 10){
-                      
-                        AnimatedText(text: nasheedName, delay: 0.04, size: 30)
+                    VStack(alignment: .center, spacing: 6){
+        
+                        AnimatedText(text: nasheedName, font: .title, delay: 0.03,
+                                     maxCharsPerLine: UIDevice.current.userInterfaceIdiom == .pad ? 35 : 24)
                             .fontDesign(.serif)
-//                            .lineLimit(2)
                             .dynamicTypeSize(.xSmall ... .xxLarge)
                             .padding(.horizontal, 20)
                             .id(nasheedID)
                             
                         
-                        AnimatedText(text: reciter, delay: 0.04, size: 24)
+                        AnimatedText(text: reciter, font: .title2, delay: 0.03,
+                                     maxCharsPerLine: UIDevice.current.userInterfaceIdiom == .pad ? 35 : 24)
                             .fontDesign(.serif)
                             .minimumScaleFactor(dynamicTypeSize.customMinScaleFactor)
                             .foregroundStyle(.secondary)
