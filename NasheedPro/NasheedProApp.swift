@@ -15,7 +15,7 @@ struct NasheedProApp: App {
     @StateObject private var viewmodel = NasheedViewModel()
     @StateObject private var miniHandler = MinimizableViewHandler()
     @State private var showLaunchView: Bool = true
-    
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
     
     init() {
         FirebaseApp.configure()
@@ -28,7 +28,9 @@ struct NasheedProApp: App {
             ZStack {
                 NavigationStack {
                     MainView()
+                        .dynamicTypeSize(.xSmall ... .accessibility1)
                 }
+                
                 .environmentObject(viewmodel)
                 .environmentObject(miniHandler)
                 

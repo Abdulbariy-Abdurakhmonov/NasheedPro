@@ -8,21 +8,25 @@
 import SwiftUI
 
 struct ControllButton: View {
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
     
     let icon: String
     let size: CGFloat
+//    let font: Font
     let color: Color
     
     var body: some View {
         Image(systemName: icon)
-            .font(.system(size: size))
+            .scaledFont(name: "", size: size)
+            .minimumScaleFactor(dynamicTypeSize.customMinScaleFactor)
             .padding(.trailing)
             .foregroundStyle(color)
+        
     }
 }
 
 
 #Preview {
-    ControllButton(icon: "info.circle", size: 40, color: primary)
+    ControllButton(icon: "info.circle", size: 24, color: primary)
         
 }

@@ -11,8 +11,7 @@ struct DownloadButtonView: View {
     var body: some View {
         VStack {
             Image(systemName: "icloud.and.arrow.down")
-                .resizable()
-                .scaledToFit()
+                .font(.title2)
                 .foregroundStyle(Color.theme.accent)
                 .fontWeight(.semibold)
             

@@ -12,6 +12,7 @@ struct PlayingDetailView: View {
     
     @EnvironmentObject var miniHandler: MinimizableViewHandler
     @EnvironmentObject var viewModel: NasheedViewModel
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
 
     var animationNamespaceId: Namespace.ID
     
@@ -27,7 +28,8 @@ struct PlayingDetailView: View {
                 fullScreenTextsAndControllers()
                 Spacer()
             }
-            
+            .minimumScaleFactor(dynamicTypeSize.customMinScaleFactor)
+            .dynamicTypeSize(.xSmall ... .accessibility1)
         }.transition(AnyTransition.move(edge: .bottom))
     }
 }
@@ -59,7 +61,10 @@ extension PlayingDetailView {
             HStack {
                 
                 Button(action: {
-                    self.miniHandler.minimize()
+                    withAnimation {
+                        self.miniHandler.minimize()
+                    }
+                    
                 }) {
                     Image(systemName: "chevron.down")
                         .font(.system(size: 24))
@@ -71,23 +76,31 @@ extension PlayingDetailView {
                 Spacer()
                 
                 Button(action: {
+                    
+                    withAnimation {
+                        self.miniHandler.dismiss()
+                    }
+                    
                     AudioPlayerManager.shared.stop()
-                    self.miniHandler.dismiss()
                     AudioPlayerManager.shared.isRepeatEnabled = false
                     AudioPlayerManager.shared.sleepTimer.cancelSleepTimer()
+                    
                 }) {
                     Image(systemName: "xmark")
                         .font(.system(size: 20))
                         .foregroundColor(.accent)
                         .fontWeight(.medium)
                     
-                }.padding(.trailing, 10)
+                }
+                .padding(.trailing, 10)
                     .frame(width: self.miniHandler.isMinimized == false ? nil : 0, height: self.miniHandler.isMinimized == false ? nil : 0)
             }.frame(width: self.miniHandler.isMinimized == false ? nil : 0, height: self.miniHandler.isMinimized == false ? nil : 0)
                 .padding(.horizontal, 10)
+                .minimumScaleFactor(dynamicTypeSize.customMinScaleFactor)
         }
         .frame(width: self.miniHandler.isMinimized == false ? nil : 0, height: self.miniHandler.isMinimized == false ? nil : 0).opacity(self.miniHandler.isMinimized ? 0 : 1)
             .padding(.top, self.miniHandler.isMinimized ? 0 : 50)
+            .minimumScaleFactor(dynamicTypeSize.customMinScaleFactor)
     }
     
     private func imageAndMiniViews(proxy: GeometryProxy) -> some View {
@@ -97,6 +110,7 @@ extension PlayingDetailView {
               }
 
               imageView(proxy: proxy)
+                  
 
               if miniHandler.isMinimized {
                   miniControllerView()
@@ -129,15 +143,16 @@ extension PlayingDetailView {
     private func miniControllerView() -> some View {
         HStack {
             VStack(alignment: .leading) {
-                Spacer()
-                MarqueeText(text: nasheedName, font: .system(size: 23.5, weight: .regular))
+                
+                MarqueeText(text: nasheedName, size: 22)
                     .matchedGeometryEffect(id: nasheedName, in: animationNamespaceId)
                     .fontDesign(.serif)
+                    .padding(.top, 5)
+
                 Text(reciter)
-                    .font(.headline)
                     .fontDesign(.serif)
+                    .scaledFont(name: "serif", size: 19)
                     .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: true, vertical: false)
                     .matchedGeometryEffect(id: reciter, in: animationNamespaceId)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -146,6 +161,8 @@ extension PlayingDetailView {
                 .padding(.trailing, 16)
                 .frame(width: 100)
                 .padding(.leading, 6)
+
+                
         }
     }
     
@@ -153,26 +170,35 @@ extension PlayingDetailView {
         Group {
             if !miniHandler.isMinimized {
                 VStack {
-                    AnimatedText(text: nasheedName, font: .title, delay: 0.02)
-                        .fontDesign(.serif)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                        .padding(.horizontal)
-                        .id(nasheedID)
                     
-                    AnimatedText(text: reciter, font: .title2, delay: 0.02)
-                        .fontDesign(.serif)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                        .id(nasheedID)
+                    VStack(alignment: .center, spacing: 10){
+                      
+                        AnimatedText(text: nasheedName, delay: 0.04, size: 30)
+                            .fontDesign(.serif)
+//                            .lineLimit(2)
+                            .dynamicTypeSize(.xSmall ... .xxLarge)
+                            .padding(.horizontal, 20)
+                            .id(nasheedID)
+                            
+                        
+                        AnimatedText(text: reciter, delay: 0.04, size: 24)
+                            .fontDesign(.serif)
+                            .minimumScaleFactor(dynamicTypeSize.customMinScaleFactor)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                            .id(nasheedID)
+                    }
+                    
+                    .padding(.horizontal, 10)
     
                     PlayControllerView()
+                    
                         .padding(.top)
                 }
                 .padding(.top, 20)
             }
         }
+        
         
     }
     

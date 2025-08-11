@@ -22,7 +22,7 @@ struct SleepTimerButton: View {
             sleepButton(for: 20 * 60, label: "20 Minutes")
             sleepButton(for: 10 * 60, label: "10 Minutes")
         } label: {
-            ControllButton(icon: sleepTManager.isSleepTimerActive ? "moon.zzz.fill" : "moon.zzz", size: 28, color: sleepTManager.isSleepTimerActive ? .accent.opacity(0.7) : .secondary)
+            ControllButton(icon: sleepTManager.isSleepTimerActive ? "moon.zzz.fill" : "moon.zzz", size: 24, color: sleepTManager.isSleepTimerActive ? .accent.opacity(0.7) : .secondary)
                 .animation(.spring(response: 0.5, dampingFraction: 0.7), value: sleepTManager.isSleepTimerActive)
         }
         .overlay {

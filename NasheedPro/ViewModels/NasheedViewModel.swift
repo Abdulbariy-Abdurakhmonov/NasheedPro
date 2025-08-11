@@ -91,28 +91,31 @@ final class NasheedViewModel: ObservableObject {
         
     }
     
+
     
-    //new one
-    @MainActor
     func loadNasheeds() {
            Task {
                do {
+     
                    let fetched = try await firebaseService.fetchNasheeds()
 
                    var updated = fetched
 
                    // Restore liked state from Core Data (off-main-thread is OK)
                    let likedIds = likeService.likedEntities.compactMap { $0.likedID }
-
                    for index in updated.indices {
                        if likedIds.contains(updated[index].id) {
                            updated[index].isLiked = true
                        }
                    }
-
-                   self.nasheeds = updated
-                   self.likedNasheeds = updated.filter { $0.isLiked }
-
+                   
+                   let safeUpdated = updated  // Immutable copy
+                   
+                   await MainActor.run {
+                       self.nasheeds = safeUpdated
+                       self.likedNasheeds = safeUpdated.filter { $0.isLiked }
+                   }
+                   
                    print("✅ Loaded \(updated.count) nasheeds")
                } catch {
                    print("❌ Error loading nasheeds: \(error)")

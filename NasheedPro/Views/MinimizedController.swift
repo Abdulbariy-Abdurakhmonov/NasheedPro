@@ -10,10 +10,10 @@ import SwiftUI
 
 struct MinimizedController: View {
     
-//    let nasheed: NasheedModel
-//    @Binding var isPlaying: Bool
     @ObservedObject var player: AudioPlayerManager
     @EnvironmentObject var viewModel: NasheedViewModel
+    
+    
     var body: some View {
         HStack(spacing: 0){
             
@@ -21,18 +21,18 @@ struct MinimizedController: View {
             
             Button(action: {
                 guard let url = URL(string: viewModel.selectedNasheed?.audioURL ?? "") else { return }
-                AudioPlayerManager.shared.togglePlayPause(url: url)
+//                AudioPlayerManager.shared.togglePlayPause(url: url)
+                player.togglePlayPause(url: url)
                 
             }, label: {
-                ControllButton(icon: player.isPlaying ? "pause.fill" : "play.fill", size: 28, color: primary)
+                ControllButton(icon: player.isPlaying ? "pause.fill" : "play.fill", size: 24, color: primary)
 
             })
             
-            Button(action: {}, label: {
-                
-                Image(systemName: "forward.fill")
-                    .font(.title2)
-                    .foregroundColor(.primary)
+            Button(action: {
+                player.playNext()
+            }, label: {
+                ControllButton(icon: "forward.fill", size: 24, color: .primary)
             })
         }
         

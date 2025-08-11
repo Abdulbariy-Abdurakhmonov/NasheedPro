@@ -11,32 +11,38 @@ struct NasheedRowView: View {
     
 //    @ObservedObject var nasheed: NasheedModel
     let nasheed: NasheedModel
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
     
     
     var body: some View {
+        
         HStack {
             ImageLoader(url: nasheed.imageURL)
-                .frame(width: 46, height: 46)
+                .dynamicImageSize(base: 45)
                 .cornerRadius(36)
                 .padding(.trailing, 10)
 
+            
             VStack(alignment: .leading) {
                 Text(nasheed.title)
-                    .font(.title3)
+                    .scaledFont(name: "Rounded", size: 22)
+//                    .fontDesign(.monospaced)
                     .fontDesign(.serif)
                     
+                               
                 Text(nasheed.reciter)
-                    .font(.subheadline)
+                    .scaledFont(name: "Serif", size: 17.5)
                     .fontDesign(.serif)
                     .foregroundStyle(.secondary)
-                
+        
             }
-           
+                       
             Spacer()
             
             DownloadButtonView()
-                .frame(width: 26, height: 26)
+                
         }
+        .dynamicTypeSize(.xSmall ... .accessibility1)
         
 
     }

@@ -37,7 +37,6 @@ struct SDWebImageLoader: View {
         
         WebImage(url: URL(string: url))
             .resizable()
-            .scaledToFit()
             .aspectRatio(contentMode: contentMode)
     }
 }

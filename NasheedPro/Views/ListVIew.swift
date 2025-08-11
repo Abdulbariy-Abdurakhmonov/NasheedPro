@@ -74,7 +74,7 @@ extension ListVIew {
             List {
                 ForEach(nasheedsOf) { nasheed in
                     NasheedRowView(nasheed: nasheed)
-                    
+                        .contentShape(Rectangle())
                         .onTapGesture {
                             
                             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -104,13 +104,13 @@ extension ListVIew {
                             
                         }
                         .padding(.trailing, 20)
-                        .listRowBackground(Color.clear)
+//                        .listRowBackground(Color.clear)
                 }
                 .listSectionSeparator(.hidden, edges: .all)
             }
             .transition(.opacity)
             .scrollIndicators(.hidden)
-            .listStyle(.plain)
+            .listStyle(.insetGrouped)
             .safeAreaInset(edge: .bottom) {
                 Color.clear
                     .frame(height: miniHandler.isMinimized ? 68 : 0)
@@ -141,6 +141,8 @@ extension ListVIew {
             .searchable(text: $viewModel.searchText,
                         prompt: viewModel.searchMode ==
                 .reciter ? "Search a reciter..." :  "Search a nasheed...")
+            .dynamicTypeSize(.xSmall ... .accessibility1)
+            
             .disabled(viewModel.baseNasheeds.isEmpty)
         }
         

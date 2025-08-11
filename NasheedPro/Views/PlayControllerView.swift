@@ -30,6 +30,7 @@ struct PlayControllerView: View {
             upperButtons
             lowerButtons
         }
+        .dynamicTypeSize(.xSmall ... .accessibility1)
     }
     
 }
@@ -116,14 +117,14 @@ extension PlayControllerView {
             HStack(spacing: 16) {
                 Button {
                     player.rewind15Seconds()
-                } label: { ControllButton(icon: "15.arrow.trianglehead.counterclockwise", size: 24, color: primary) }.disabled(!player.isPlayerReady)
+                } label: { ControllButton(icon: "15.arrow.trianglehead.counterclockwise", size: 24, color: primary) }.disabled(!player.isPlayerReady || !player.isPlaying)
                 
                 
                 Button {
                     player.playPrevious()
                 } label: {
                     HStack(spacing: -20) {
-                        ControllButton(icon: "arrowtriangle.left.fill", size: 19, color: primary)
+                        ControllButton(icon: "arrowtriangle.left.fill", size: 22, color: primary)
                         ControllButton(icon: "arrowtriangle.left.fill", size: 22, color: primary)
                     }
                 }
@@ -135,19 +136,22 @@ extension PlayControllerView {
                     
                 } label: { ControllButton(icon: player.isPlaying ? "pause.fill" : "play.fill", size: 35, color: primary) }
                 
+            
+                
                 Button {
                     player.playNext()
                     
                 } label: {
                     HStack(spacing: -20) {
                         ControllButton(icon: "arrowtriangle.right.fill", size: 22, color: primary)
-                        ControllButton(icon: "arrowtriangle.right.fill", size: 19, color: primary)
+                        ControllButton(icon: "arrowtriangle.right.fill", size: 22, color: primary)
+                        
                     }
                 }
                 
                 Button {
                     player.forward15Seconds()
-                } label: { ControllButton(icon: "15.arrow.trianglehead.clockwise", size: 24, color: primary) }.disabled(!player.isPlayerReady)
+                } label: { ControllButton(icon: "15.arrow.trianglehead.clockwise", size: 24, color: primary) }.disabled(!player.isPlayerReady || !player.isPlaying)
             }.overlay(content: {
                 if !player.isPlayerReady {
                        ProgressView()
@@ -164,7 +168,7 @@ extension PlayControllerView {
         HStack {
             SleepTimerButton(sleepTManager: AudioPlayerManager.shared.sleepTimer)
             Spacer()
-            LikeButtonView(size: 28) {
+            LikeButtonView() {
                 if let nasheed = viewModel.selectedNasheed {
                     viewModel.toggleLike(for: nasheed)
                 }
@@ -180,7 +184,7 @@ extension PlayControllerView {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {isRotating = false}
                 player.isRepeatEnabled = isRepeatEnabled
             } label: {
-                    ControllButton(icon:isRepeatEnabled ? "repeat.1" : "repeat", size: 28,
+                ControllButton(icon:isRepeatEnabled ? "repeat.1" : "repeat", size: 24,
                                    color: isRepeatEnabled ? .accent.opacity(0.7): .secondary)
 //                    .rotationEffect(.degrees(isRotating ? 15 : 0))
                     .scaleEffect(isRotating ? 1.2 : 1)

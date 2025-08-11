@@ -9,7 +9,6 @@ import SwiftUI
 
 struct LikeButtonView: View {
 
-    let size: CGFloat
     @EnvironmentObject var viewModel: NasheedViewModel
     
     @State private var heartStyle: AnyShapeStyle = AnyShapeStyle(Color.gray)
@@ -23,9 +22,9 @@ struct LikeButtonView: View {
     
     var body: some View {
         Image(systemName: viewModel.selectedNasheed?.isLiked ?? false ? "heart.fill" : "heart")
-            .font(.system(size: size))
+            .scaledFont(name: "", size: 25)
             .foregroundStyle(heartStyle)
-            .scaleEffect(animate ? 1.3 : 1.0)
+            .scaleEffect(animate ? 1.4 : 1.0)
             .onTapGesture {
                 wasTapped = true
                 tapAction()
@@ -90,5 +89,6 @@ struct LikeButtonView: View {
 
 
 #Preview {
-    LikeButtonView(size: 28, tapAction: {})
+    LikeButtonView(tapAction: {})
+        .environmentObject(dev.nasheedVM)
 }
