@@ -12,10 +12,13 @@ import FirebaseFirestore
 
 final class NasheedViewModel: ObservableObject {
     
+    @Published var downloadStates: [String: DownloadButtonView.DownloadState] = [:]
+
+       
+    @Published var downloadedNasheeds: [DownloadedNasheedModel] = []
+    
     @Published var likedNasheeds: [NasheedModel] = []
-    
     @Published var nasheeds: [NasheedModel] = []
-    
     @Published var selectedNasheed: NasheedModel?
     
     @Published var searchMode: SearchMode = .title
@@ -23,38 +26,29 @@ final class NasheedViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
     @Published var isLiked: Bool = false
+    @Published var currentScope: ScopeType = .all
     
     let service = MediaService()
     let likeService = LikePersistingService()
-    
     private let firebaseService = FirebaseService()
+    let haptic = HapticManager.shared
+    
+    private let downloadService = DownloadService()
    
 
+ 
+    enum ScopeType { case all, liked, downloaded }
     
-    @Published var currentScope: ScopeType = .all
+    enum SearchMode { case reciter, title }
     
-    enum ScopeType {
-        case all
-        case liked
-        case downloaded
-    }
-    
-    enum SearchMode {
-        case reciter
-        case title
-    }
-    
-    
-   
+    init() {
+            loadDownloadedNasheeds()
+        }
     
     
     // MARK: - Base Source Lists
     var allNasheeds: [NasheedModel] {
         nasheeds
-    }
-
-    var downloadedNasheeds: [NasheedModel] {
-        nasheeds.filter { $0.isDownloaded }
     }
     
     
@@ -65,10 +59,75 @@ final class NasheedViewModel: ObservableObject {
         case .liked:
             return likedNasheeds
         case .downloaded:
-            return downloadedNasheeds
+            return  downloadedNasheeds.compactMap { local in
+                NasheedModel(
+                    id: local.id,
+                    title: local.title,
+                    reciter: local.reciter,
+                    imageURL: local.localImageURL.absoluteString,
+                    audioURL: local.localAudioURL.absoluteString,
+                    isDownloaded: true
+                )
+            }
         }
     }
     
+    
+    func loadDownloadedNasheeds() {
+           downloadedNasheeds = downloadService.loadAllDownloads()
+       }
+
+    func stateFor(_ nasheed: NasheedModel) -> DownloadButtonView.DownloadState {
+        if let s = downloadStates[nasheed.id] {
+            return s
+        }
+        return downloadedNasheeds.contains(where: { $0.id == nasheed.id }) ? .downloaded : .notDownloaded
+    }
+
+    
+    
+    func downloadNasheed(_ nasheed: NasheedModel) {
+        downloadStates[nasheed.id] = .downloading(0.0)
+
+        Task {
+            do {
+                let downloaded = try await downloadService.downloadNasheed(
+                    nasheed,
+                    progressHandler: { progress in
+                        Task { @MainActor in
+                            self.downloadStates[nasheed.id] = .downloading(progress)
+                        }
+                    }
+                )
+                
+                await MainActor.run {
+                    self.downloadedNasheeds.append(downloaded)
+                    self.downloadStates[nasheed.id] = .finished
+                    haptic.generator.notificationOccurred(.success)
+
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
+                     
+                        if self?.downloadStates[nasheed.id] == .finished {
+                            self?.downloadStates[nasheed.id] = .downloaded
+                        }
+                    }
+                }
+                
+            } catch {
+                await MainActor.run {
+                    self.errorMessage = "Download failed: \(error.localizedDescription)"
+                    self.downloadStates[nasheed.id] = .notDownloaded
+                }
+            }
+        }
+
+    }
+
+
+
+
+
     
     var filteredNasheeds: [NasheedModel] {
         

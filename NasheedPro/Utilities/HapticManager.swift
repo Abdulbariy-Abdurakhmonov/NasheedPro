@@ -16,6 +16,7 @@ class HapticManager {
     private let impactGenerator = UIImpactFeedbackGenerator(style: .light)
     private let selectionGenerator = UISelectionFeedbackGenerator()
     private var lastTickTime: TimeInterval = 0
+    let generator = UINotificationFeedbackGenerator()
 
     private init() {}
 

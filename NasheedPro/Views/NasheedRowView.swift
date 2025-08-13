@@ -10,8 +10,11 @@ import SwiftUI
 struct NasheedRowView: View {
     
 //    @ObservedObject var nasheed: NasheedModel
+    
+    
     let nasheed: NasheedModel
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
+    @EnvironmentObject var viewModel: NasheedViewModel
     
     
     var body: some View {
@@ -26,7 +29,6 @@ struct NasheedRowView: View {
             VStack(alignment: .leading) {
                 Text(nasheed.title)
                     .scaledFont(name: "Rounded", size: 22)
-//                    .fontDesign(.monospaced)
                     .fontDesign(.serif)
                     
                                
@@ -39,7 +41,13 @@ struct NasheedRowView: View {
                        
             Spacer()
             
-            DownloadButtonView()
+            DownloadButtonView(
+                state: viewModel.stateFor(nasheed),
+                action: { viewModel.downloadNasheed(nasheed) }
+            )
+
+
+                
                 
         }
         .dynamicTypeSize(.xSmall ... .accessibility1)

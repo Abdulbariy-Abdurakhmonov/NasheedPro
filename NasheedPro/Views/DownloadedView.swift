@@ -11,6 +11,7 @@ import MinimizableView
 struct DownloadedView: View {
     
     @EnvironmentObject private var viewModel: NasheedViewModel
+//    @ObservedObject var downloadedVM: DownloadedNasheedViewModel
     @Binding var selectedNasheed: NasheedModel?
     
     var body: some View {
