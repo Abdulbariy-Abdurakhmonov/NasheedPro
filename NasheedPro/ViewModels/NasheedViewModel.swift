@@ -8,13 +8,12 @@
 import Foundation
 import SwiftUI
 import FirebaseFirestore
+import Combine
 
 
 final class NasheedViewModel: ObservableObject {
     
     @Published var downloadStates: [String: DownloadButtonView.DownloadState] = [:]
-
-       
     @Published var downloadedNasheeds: [DownloadedNasheedModel] = []
     
     @Published var likedNasheeds: [NasheedModel] = []
@@ -28,11 +27,14 @@ final class NasheedViewModel: ObservableObject {
     @Published var isLiked: Bool = false
     @Published var currentScope: ScopeType = .all
     
+    @Published private(set) var debouncedText: String = ""  // <- for debounce
+
+    private var cancellables = Set<AnyCancellable>() // <- for Combine
+    
     let service = MediaService()
     let likeService = LikePersistingService()
     private let firebaseService = FirebaseService()
     let haptic = HapticManager.shared
-    
     private let downloadService = DownloadService()
    
 
@@ -42,8 +44,21 @@ final class NasheedViewModel: ObservableObject {
     enum SearchMode { case reciter, title }
     
     init() {
-            loadDownloadedNasheeds()
-        }
+        
+        loadDownloadedNasheeds()
+        
+        $searchText
+             .removeDuplicates()
+             .debounce(for: .milliseconds(300), scheduler: DispatchQueue.main)
+             .sink { [weak self] value in
+                 guard let self = self else { return }
+                 
+                 Task { @MainActor in
+                     self.debouncedText = value
+                 }
+             }
+             .store(in: &cancellables)
+    }
     
     
     // MARK: - Base Source Lists
@@ -72,6 +87,30 @@ final class NasheedViewModel: ObservableObject {
         }
     }
     
+    
+    
+    var filteredNasheeds: [NasheedModel] {
+        
+        searchNasheeds(in: baseNasheeds, using: debouncedText)
+    }
+    
+    
+    func searchNasheeds(in source: [NasheedModel], using text: String) -> [NasheedModel] {
+        guard !text.isEmpty else { return source }
+
+        
+        return source.filter {
+            switch searchMode {
+            case .title:
+                return $0.title.localizedCaseInsensitiveContains(text)
+            case .reciter:
+                return $0.reciter.localizedCaseInsensitiveContains(text)
+            }
+        }
+        
+    }
+    
+
     
     func loadDownloadedNasheeds() {
            downloadedNasheeds = downloadService.loadAllDownloads()
@@ -124,32 +163,6 @@ final class NasheedViewModel: ObservableObject {
 
     }
 
-
-
-
-
-    
-    var filteredNasheeds: [NasheedModel] {
-        
-        searchNasheeds(in: baseNasheeds, using: searchText)
-    }
-    
-    
-    func searchNasheeds(in source: [NasheedModel], using text: String) -> [NasheedModel] {
-        guard !text.isEmpty else { return source }
-
-        
-        return source.filter {
-            switch searchMode {
-            case .title:
-                return $0.title.localizedCaseInsensitiveContains(text)
-            case .reciter:
-                return $0.reciter.localizedCaseInsensitiveContains(text)
-            }
-        }
-        
-    }
-    
 
     
     func loadNasheeds() {

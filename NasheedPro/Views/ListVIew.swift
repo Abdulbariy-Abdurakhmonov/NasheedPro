@@ -30,6 +30,7 @@ struct ListVIew: View {
             Color.theme.background
                 .ignoresSafeArea()
             
+            
             withAnimation(.spring(duration: 0.4)) {
                 conditionalViews
             }
@@ -70,6 +71,9 @@ extension ListVIew {
     }
     
     private var listParts: some View {
+        
+        
+        
         withAnimation(.spring(duration: 0.3)) {
             List {
                 ForEach(nasheedsOf) { nasheed in
@@ -123,7 +127,7 @@ extension ListVIew {
     private var conditionalViews: some View {
         
         NavigationStack {
-            VStack {
+            VStack(spacing: 0){
                 if viewModel.baseNasheeds.isEmpty {
                     withAnimation(.spring(duration: 0.3)) {
                         contentUnavailableView()
@@ -137,14 +141,23 @@ extension ListVIew {
             
             .toolbar {
                 searchToolBar
+
             }
-            .searchable(text: $viewModel.searchText,
-                        prompt: viewModel.searchMode ==
-                .reciter ? "Search a reciter..." :  "Search a nasheed...")
-            .dynamicTypeSize(.xSmall ... .accessibility1)
+            .searchable(
+                text: $viewModel.searchText,
+                placement: .navigationBarDrawer(displayMode: .always),
+                prompt: viewModel.searchMode == .reciter
+                ? "Search a reciter..."
+                :  "Search a nasheed..."
+            )
             
+            
+          
+            
+            .dynamicTypeSize(.xSmall ... .accessibility1)
             .disabled(viewModel.baseNasheeds.isEmpty)
         }
+        
         
     }
     

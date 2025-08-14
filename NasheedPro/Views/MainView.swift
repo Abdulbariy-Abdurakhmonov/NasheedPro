@@ -12,6 +12,9 @@ struct MainView: View {
     @State var miniViewBottomMargin: CGFloat = 0
     @State var selectedNasheed: NasheedModel? = nil
     @StateObject private var miniVM: MiniViewModel
+    @State private var isOffline = true // example
+    
+    @StateObject private var network = NetworkMonitor.shared
 
         init() {
             _miniVM = StateObject(wrappedValue: MiniViewModel(miniHandler: MinimizableViewHandler(), colorScheme: .light))}
@@ -50,6 +53,13 @@ extension MainView {
         TabView {
             NavigationView {
                 OnlineView(selectedNasheed: $selectedNasheed)
+                    .disabled(!network.isConnected)
+                    .overlay {
+                        if !network.isConnected {
+                            Color.black.opacity(0.3)
+                                .allowsHitTesting(false)
+                        }
+                    }
             }
             .tabItem {
                 Image(systemName: "headphones")
@@ -87,7 +97,6 @@ extension MainView {
             miniHandler: self.miniHandler,
             miniViewBottomMargin: self.miniViewBottomMargin,
             content: {
-//                if let nasheed = self.selectedNasheed {
                 if let _ = viewModel.selectedNasheed {
                     return AnyView(PlayingDetailView(animationNamespaceId: self.namespace))
                 } else {
