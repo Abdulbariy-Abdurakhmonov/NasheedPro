@@ -26,7 +26,7 @@ struct MiniPlayerModifier: ViewModifier {
         view
         
             .background(Color(.secondarySystemFill))
-            .statusBar(hidden: miniHandler.isPresented && !miniHandler.isMinimized)
+            .statusBar(hidden: false)
             .minimizableView(
                 content: { self.content() },
                 compactView: { self.compactView() },

@@ -19,7 +19,7 @@ struct LikedView: View {
                  emptyMessage: "No liked nasheeds yet.",
                  emptyIcon: "heart.slash.fill",
                  emptyDescription: "Like a nasheed to see it here.",
-                 nasheedsOf: viewModel.filteredNasheeds,
+                 nasheedsOf: Array(viewModel.filteredNasheeds),
                  selectedNasheed: $selectedNasheed)
         .onAppear {
             viewModel.currentScope = .liked

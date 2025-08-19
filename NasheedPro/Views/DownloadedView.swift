@@ -11,26 +11,45 @@ import MinimizableView
 struct DownloadedView: View {
     
     @EnvironmentObject private var viewModel: NasheedViewModel
-//    @ObservedObject var downloadedVM: DownloadedNasheedViewModel
     @Binding var selectedNasheed: NasheedModel?
     
-    var body: some View {
+    var icon: String {
+        if #available(iOS 16, *) {
+            "bookmark.slash.fill"
+        } else {
+            "bookmark.fill"
+        }
         
-        ListVIew(title: "Downloaded Nasheeds",
-                 emptyMessage: "No downloaded nasheed yet.",
-                 emptyIcon: "bookmark.slash.fill",
-                 emptyDescription: "Download a nasheed to see it here.",
-                 nasheedsOf: viewModel.filteredNasheeds,
-                 selectedNasheed: $selectedNasheed)
+    }
+    
+    var body: some View {
+        NavigationStack {
+            ListVIew(
+                title: "Downloads",
+                emptyMessage: "No downloaded nasheed yet.",
+                emptyIcon: icon,
+                emptyDescription: "Download a nasheed to see it here.",
+                nasheedsOf: Array(viewModel.filteredNasheeds),
+                
+                
+                onMove: viewModel.moveDownloaded,
+                onDelete: viewModel.deleteDownloaded,
+                selectedNasheed: $selectedNasheed
+                
+            )
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    EditModeButton()
+                        .disabled(viewModel.baseNasheeds.isEmpty)
+                }
+            }
+        }
         .onAppear {
             viewModel.currentScope = .downloaded
         }
+ 
     }
-        
 }
-
-
-
 
 #Preview {
     NavigationStack {
@@ -39,3 +58,6 @@ struct DownloadedView: View {
     .environmentObject(dev.nasheedVM)
     .environmentObject(MinimizableViewHandler())
 }
+
+    
+

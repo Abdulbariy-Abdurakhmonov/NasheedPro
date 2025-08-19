@@ -26,24 +26,20 @@ struct NasheedProApp: App {
     var body: some Scene {
         WindowGroup {
             ZStack {
-                NavigationStack {
-                    MainView()
-                        .dynamicTypeSize(.xSmall ... .accessibility1)
+                
+                MainView()
+                    .dynamicTypeSize(.xSmall ... .accessibility1)
+                    .environmentObject(viewmodel)
+                    .environmentObject(miniHandler)
+                
+                
+                if showLaunchView {
+                    LaunchView(showLaunchView: $showLaunchView)
+                        .transition(.move(edge: .leading))
+                        .zIndex(2.0)
                 }
-                
-                .environmentObject(viewmodel)
-                .environmentObject(miniHandler)
-                
-                ZStack {
-                    if showLaunchView {
-                        LaunchView(showLaunchView: $showLaunchView)
-                            .transition(.move(edge: .leading))
-                    }
-                }
-                .zIndex(2.0)
-                
             }
-
+            
         }
         
     }

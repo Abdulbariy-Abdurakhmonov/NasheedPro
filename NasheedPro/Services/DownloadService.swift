@@ -151,4 +151,30 @@ final class DownloadService: NSObject, URLSessionDownloadDelegate {
         progressHandlers[url] = nil
         completionHandlers[url] = nil
     }
+    
+    
+    // MARK: - Delete downloaded nasheed
+    func deleteNasheed(_ nasheed: DownloadedNasheedModel) throws {
+        // Remove files
+        try? fileManager.removeItem(at: nasheed.localAudioURL)
+        try? fileManager.removeItem(at: nasheed.localImageURL)
+        
+        // Update metadata
+        var all = loadAllDownloads()
+        all.removeAll { $0.id == nasheed.id }
+        let data = try JSONEncoder().encode(all)
+        try data.write(to: downloadsDirectory.appendingPathComponent("downloads.json"))
+    }
+    
+    // MARK: - Reorder
+    func saveDownloads(_ updated: [DownloadedNasheedModel]) throws {
+        let data = try JSONEncoder().encode(updated)
+        try data.write(to: downloadsDirectory.appendingPathComponent("downloads.json"))
+    }
+    
 }
+
+
+    
+
+

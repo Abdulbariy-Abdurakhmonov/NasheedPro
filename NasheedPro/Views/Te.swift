@@ -9,83 +9,72 @@
 import SwiftUI
 import SDWebImageSwiftUI
 
-//Generic ImageLoader
-struct ImageLoader2: View {
-    
-    let url: String
-    
+
+struct EditModeButton: View {
+    @Environment(\.editMode) private var editMode
+
     var body: some View {
-     
-        Rectangle()
-            .opacity(0)
-            .overlay {
-                SDWebImageLoader2(url: url, contentMode: .fill)
-                    .allowsTightening(false)
+        Button(action: {
+            withAnimation {
+                editMode?.wrappedValue = editMode?.wrappedValue.isEditing == true ? .inactive : .active
             }
-            .clipped()
-        
-           
-   
-            
-            
+        }) {
+            Label(editMode?.wrappedValue.isEditing == true ? "Done" : "Edit",
+                  systemImage: editMode?.wrappedValue.isEditing == true ? "checkmark" : "pencil")
+                .labelStyle(.iconOnly)
+                .font(.title2)
+                .foregroundColor(editMode?.wrappedValue.isEditing == true ? .green : .blue)
+        }
     }
 }
 
-
-
-//SDWebImageLoader
-struct SDWebImageLoader2: View {
-    
-    let url: String
-    let contentMode: ContentMode
-    
-    var body: some View {
-        
-        WebImage(url: URL(string: url))
-            .resizable()
-            .aspectRatio(contentMode: contentMode)
-            
-            
-    }
-}
 
 import SwiftUI
 
 struct Te: View {
     
-    
+    @State var myArray: [String] = ["Adbus", "Adidas", "Apple", "Asus", "Bata", "Bose", "Coca-Cola", "Dell", "Huawei", "Lenovo"]
     
     var body: some View {
         
-        List{
-            ForEach(0..<10) {_ in
-                HStack {
-                    
-                    ImageLoader2(url: "https://images.unsplash.com/photo-1526045612212-70caf35c14df")
-  
-                        .dynamicImageSize(base: 40)
-                        .cornerRadius(46)
-                        .padding(.trailing, 10)
-                    
-                    Button {
+        NavigationStack {
+            List{
+                ForEach(myArray, id: \.self) { person in
+                    HStack {
+                       Image(systemName: "house.fill")
+                            .dynamicImageSize(base: 40)
+                            .cornerRadius(46)
+                            .padding(.trailing, 10)
                         
-                    } label: {
-                        Image(systemName: "apple.logo")
-                            .font(.system(size: 24))
-                            
+                        Text(person)
+                            .font(.headline)
+                        
+                        
                     }
-                    
+                }
+                .onDelete { indexSet in
+                    myArray.remove(atOffsets: indexSet)
+                }
+                .onMove { IndexSet, destination in
+                    myArray.move(fromOffsets: IndexSet, toOffset: destination)
+                }
+                
+                
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    EditModeButton()
                 }
             }
+            .listStyle(.insetGrouped)
         }
-        .listStyle(.insetGrouped)
-       
-
+        
     }
     
-   
-    
+
 }
+
+
 
 #Preview {
     Te()

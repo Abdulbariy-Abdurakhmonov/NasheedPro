@@ -31,6 +31,8 @@ final class NasheedViewModel: ObservableObject {
 
     private var cancellables = Set<AnyCancellable>() // <- for Combine
     
+//    @Published private var
+    
     let service = MediaService()
     let likeService = LikePersistingService()
     private let firebaseService = FirebaseService()
@@ -84,6 +86,21 @@ final class NasheedViewModel: ObservableObject {
                     isDownloaded: true
                 )
             }
+//
+        }
+    }
+    
+    
+    var filtererDownloadings: [NasheedModel] {
+        return  downloadedNasheeds.compactMap { local in
+            NasheedModel(
+                id: local.id,
+                title: local.title,
+                reciter: local.reciter,
+                imageURL: local.localImageURL.absoluteString,
+                audioURL: local.localAudioURL.absoluteString,
+                isDownloaded: true
+            )
         }
     }
     
@@ -122,6 +139,34 @@ final class NasheedViewModel: ObservableObject {
         }
         return downloadedNasheeds.contains(where: { $0.id == nasheed.id }) ? .downloaded : .notDownloaded
     }
+    
+    
+    func moveDownloaded(from source: IndexSet, to destination: Int) {
+          downloadedNasheeds.move(fromOffsets: source, toOffset: destination)
+          do {
+              try downloadService.saveDownloads(downloadedNasheeds)
+          } catch {
+              print("Failed to save reordered downloads: \(error)")
+          }
+      }
+    
+      
+      func deleteDownloaded(at offsets: IndexSet) {
+          let toDelete = offsets.map { downloadedNasheeds[$0] }
+          
+          for nasheed in toDelete {
+              do {
+                  try downloadService.deleteNasheed(nasheed)
+                  SoundManager.shared.playSound(named: "delete")
+                  
+              } catch {
+                  print("Failed to delete nasheed: \(error)")
+              }
+          }
+          
+          downloadedNasheeds.remove(atOffsets: offsets)
+          loadDownloadedNasheeds()
+      }
 
     
     
@@ -205,15 +250,19 @@ final class NasheedViewModel: ObservableObject {
         }
 
         guard let selectedNasheed else { return }
+        
+       
 
         nasheeds[index] = selectedNasheed
 
         objectWillChange.send()
 
         if selectedNasheed.isLiked {
+            haptic.playImpact()
             likeService.add(nasheed: selectedNasheed)
             likedNasheeds = nasheeds.filter { $0.isLiked }
         } else {
+            
             if let entity = likeService.likedEntities.first(where: { $0.likedID == selectedNasheed.id }) {
                 likeService.delete(entity: entity)
                 likedNasheeds = nasheeds.filter { $0.isLiked }

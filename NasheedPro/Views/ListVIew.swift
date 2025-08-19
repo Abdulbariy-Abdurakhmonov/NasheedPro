@@ -13,9 +13,12 @@ struct ListVIew: View {
     let emptyMessage: String
     let emptyIcon: String
     let emptyDescription: String
-    let nasheedsOf: [NasheedModel]
+    var nasheedsOf: [NasheedModel]
+    var onMove: ((IndexSet, Int) -> Void)? = nil
+    var onDelete: ((IndexSet) -> Void)? = nil
     
-    
+    @Environment(\.editMode) private var editMode
+
     
     @EnvironmentObject private var viewModel: NasheedViewModel
     @EnvironmentObject private var miniHandler: MinimizableViewHandler
@@ -70,11 +73,10 @@ extension ListVIew {
         
     }
     
+    
     private var listParts: some View {
-        
-        
-        
-        withAnimation(.spring(duration: 0.3)) {
+
+      
             List {
                 ForEach(nasheedsOf) { nasheed in
                     NasheedRowView(nasheed: nasheed)
@@ -108,10 +110,20 @@ extension ListVIew {
                             
                         }
                         .padding(.trailing, 20)
-//                        .listRowBackground(Color.clear)
+                    //                        .listRowBackground(Color.clear)
                 }
+                .onMove(perform: onMove)
+                .onDelete(perform: onDelete)
                 .listSectionSeparator(.hidden, edges: .all)
+                
             }
+            .transaction { tx in
+                   if editMode?.wrappedValue.isEditing == true {
+                       tx.disablesAnimations = true
+                   }
+               }
+            
+            
             .transition(.opacity)
             .scrollIndicators(.hidden)
             .listStyle(.insetGrouped)
@@ -119,14 +131,14 @@ extension ListVIew {
                 Color.clear
                     .frame(height: miniHandler.isMinimized ? 68 : 0)
             }
-        }
+        
         .navigationTitle(title)
         .toolbarTitleDisplayMode(.inline)
     }
     
     private var conditionalViews: some View {
         
-        NavigationStack {
+        
             VStack(spacing: 0){
                 if viewModel.baseNasheeds.isEmpty {
                     withAnimation(.spring(duration: 0.3)) {
@@ -136,12 +148,13 @@ extension ListVIew {
                     UnavailableView(searchResult: viewModel.searchText)
                 } else {
                     listParts
+                    
                 }
             }
             
             .toolbar {
                 searchToolBar
-
+                
             }
             .searchable(
                 text: $viewModel.searchText,
@@ -152,11 +165,11 @@ extension ListVIew {
             )
             
             
-          
+            
             
             .dynamicTypeSize(.xSmall ... .accessibility1)
             .disabled(viewModel.baseNasheeds.isEmpty)
-        }
+        
         
         
     }
