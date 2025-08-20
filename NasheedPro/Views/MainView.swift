@@ -85,6 +85,7 @@ extension MainView {
                 Text("Downloads")
             }.tag(2)
         }
+        .toolbar(.visible, for: .tabBar)
         .modifier(miniPlayerModifier())
         .environmentObject(self.miniHandler)
     }

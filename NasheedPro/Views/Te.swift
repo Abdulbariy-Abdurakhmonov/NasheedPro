@@ -15,9 +15,19 @@ struct EditModeButton: View {
 
     var body: some View {
         Button(action: {
-            withAnimation {
-                editMode?.wrappedValue = editMode?.wrappedValue.isEditing == true ? .inactive : .active
-            }
+            
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
+                                                       to: nil, from: nil, for: nil)
+            
+            withAnimation(.spring(response: 0.25, dampingFraction: 1)) {
+                          if editMode?.wrappedValue.isEditing == true {
+                              editMode?.wrappedValue = .inactive
+                          } else {
+                              editMode?.wrappedValue = .active
+                          }
+                      }
+            
+            
         }) {
             Label(editMode?.wrappedValue.isEditing == true ? "Done" : "Edit",
                   systemImage: editMode?.wrappedValue.isEditing == true ? "checkmark" : "pencil")
@@ -25,6 +35,7 @@ struct EditModeButton: View {
                 .font(.title2)
                 .foregroundColor(editMode?.wrappedValue.isEditing == true ? .green : .blue)
         }
+        .contentShape(Rectangle())
     }
 }
 

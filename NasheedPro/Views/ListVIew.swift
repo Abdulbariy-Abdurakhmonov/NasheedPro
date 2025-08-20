@@ -17,9 +17,6 @@ struct ListVIew: View {
     var onMove: ((IndexSet, Int) -> Void)? = nil
     var onDelete: ((IndexSet) -> Void)? = nil
     
-    @Environment(\.editMode) private var editMode
-
-    
     @EnvironmentObject private var viewModel: NasheedViewModel
     @EnvironmentObject private var miniHandler: MinimizableViewHandler
     @State private var showDetailView: Bool = false
@@ -32,12 +29,7 @@ struct ListVIew: View {
         ZStack {
             Color.theme.background
                 .ignoresSafeArea()
-            
-            
-            withAnimation(.spring(duration: 0.4)) {
                 conditionalViews
-            }
-            
         }
     }
 }
@@ -73,106 +65,84 @@ extension ListVIew {
         
     }
     
-    
+ 
     private var listParts: some View {
-
-      
-            List {
-                ForEach(nasheedsOf) { nasheed in
-                    NasheedRowView(nasheed: nasheed)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            
-                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                            
-                            DispatchQueue.main.async {
-                                viewModel.selectedNasheed = nasheed
-                                
-                                
-                                if let index = nasheedsOf.firstIndex(where: { $0.id == nasheed.id }) {
-                                    AudioPlayerManager.shared.loadAndPlay(nasheeds: nasheedsOf, index: index)
-                                    AudioPlayerManager.shared.onNasheedChange  = { newNasheed in
-                                        withAnimation(.spring()) {
-                                            viewModel.selectedNasheed = newNasheed
-                                            AudioPlayerManager.shared.isRepeatEnabled = false
-                                        }
-                                    }
-                                    
-                                    withAnimation(.spring) {
-                                        if self.miniHandler.isPresented {
-                                            self.miniHandler.expand()
-                                        } else {
-                                            self.miniHandler.present()
-                                        }
-                                    }
+        ForEach(nasheedsOf) { nasheed in
+            NasheedRowView(nasheed: nasheed)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                    DispatchQueue.main.async {
+                        viewModel.selectedNasheed = nasheed
+                        if let index = nasheedsOf.firstIndex(where: { $0.id == nasheed.id }) {
+                            AudioPlayerManager.shared.loadAndPlay(nasheeds: nasheedsOf, index: index)
+                            AudioPlayerManager.shared.onNasheedChange  = { newNasheed in
+                                withAnimation(.spring()) {
+                                    viewModel.selectedNasheed = newNasheed
+                                    AudioPlayerManager.shared.isRepeatEnabled = false
                                 }
                             }
                             
+                            withAnimation(.spring) {
+                                if self.miniHandler.isPresented {
+                                    self.miniHandler.expand()
+                                } else {
+                                    self.miniHandler.present()
+                                }
+                            }
                         }
-                        .padding(.trailing, 20)
-                    //                        .listRowBackground(Color.clear)
+                    }
+                    
                 }
-                .onMove(perform: onMove)
-                .onDelete(perform: onDelete)
-                .listSectionSeparator(.hidden, edges: .all)
-                
+                .padding(.trailing, 20)
+        }
+        .onDelete(perform: onDelete)
+        .listSectionSeparator(.hidden, edges: .all)
+    }
+    
+    
+    
+    private var conditionalViews: some View {
+        VStack(spacing: 0) {
+            List {
+                if viewModel.baseNasheeds.isEmpty {
+                    Section {
+                        contentUnavailableView()
+                            .frame(maxWidth: .infinity, minHeight: 300)
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                    }
+                } else if viewModel.filteredNasheeds.isEmpty && !viewModel.searchText.isEmpty {
+                    Section {
+                        UnavailableView(searchResult: viewModel.searchText)
+                            .frame(maxWidth: .infinity, minHeight: 300)
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                    }
+                } else {
+                    listParts
+                }
             }
-            .transaction { tx in
-                   if editMode?.wrappedValue.isEditing == true {
-                       tx.disablesAnimations = true
-                   }
-               }
-            
-            
-            .transition(.opacity)
             .scrollIndicators(.hidden)
             .listStyle(.insetGrouped)
             .safeAreaInset(edge: .bottom) {
-                Color.clear
-                    .frame(height: miniHandler.isMinimized ? 68 : 0)
+                Color.clear.frame(height: miniHandler.isMinimized ? 65 : 0)
             }
-        
+        }
         .navigationTitle(title)
         .toolbarTitleDisplayMode(.inline)
+        .toolbar { searchToolBar }
+        .searchable(
+            text: $viewModel.searchText,
+            placement: .navigationBarDrawer(displayMode: .always),
+            prompt: viewModel.searchMode == .reciter
+            ? "Search a reciter..."
+            : "Search a nasheed..."
+        )
+        .dynamicTypeSize(.xSmall ... .accessibility1)
     }
     
-    private var conditionalViews: some View {
-        
-        
-            VStack(spacing: 0){
-                if viewModel.baseNasheeds.isEmpty {
-                    withAnimation(.spring(duration: 0.3)) {
-                        contentUnavailableView()
-                        .transition(.opacity)}
-                } else if viewModel.filteredNasheeds.isEmpty && !viewModel.searchText.isEmpty {
-                    UnavailableView(searchResult: viewModel.searchText)
-                } else {
-                    listParts
-                    
-                }
-            }
-            
-            .toolbar {
-                searchToolBar
-                
-            }
-            .searchable(
-                text: $viewModel.searchText,
-                placement: .navigationBarDrawer(displayMode: .always),
-                prompt: viewModel.searchMode == .reciter
-                ? "Search a reciter..."
-                :  "Search a nasheed..."
-            )
-            
-            
-            
-            
-            .dynamicTypeSize(.xSmall ... .accessibility1)
-            .disabled(viewModel.baseNasheeds.isEmpty)
-        
-        
-        
-    }
+    
     
     func contentUnavailableView() -> some View {
         ContentUnavailableView {
@@ -180,7 +150,7 @@ extension ListVIew {
         } description: {
             Text(emptyDescription)
         }
-        
     }
+    
     
 }

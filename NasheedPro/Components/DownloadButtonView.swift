@@ -1,9 +1,7 @@
 //
 //  DownloadButtonView.swift
 //  NasheedPro
-//
-//  Created by Abdulboriy on 29/06/25.
-//
+
 
 import SwiftUI
 
@@ -67,10 +65,11 @@ struct DownloadButtonView: View {
             
 
         case .downloaded:
-          EmptyView()
-      
+            EmptyView()
         }
     }
+    
+    
 
     private var isInteractive: Bool {
         switch state {
@@ -80,6 +79,7 @@ struct DownloadButtonView: View {
             return false
         }
     }
+    
 }
 
 

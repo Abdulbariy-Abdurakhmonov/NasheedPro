@@ -19,46 +19,15 @@ struct PlayingDetailView: View {
     
     
     //MARK: - Body
-//    var body: some View {
-        
-//            GeometryReader { proxy in
-//                ZStack {
-//                    blurryBackground(url: viewModel.selectedNasheed?.imageURL ?? "")
-//                        .ignoresSafeArea()
-//
-//                }
-//                .allowsTightening(false)
-//                .contentShape(Rectangle())
-//                VStack(alignment: .center, spacing: 0) {
-//                    
-//                    upperControllers(safeAreaTopInset: proxy.safeAreaInsets.top)
-//                    Spacer()
-//                    imageAndMiniViews(proxy: proxy)
-//                    fullScreenTextsAndControllers()
-//                    Spacer()
-//                }
-//                
-//                
-//                .minimumScaleFactor(dynamicTypeSize.customMinScaleFactor)
-//                .dynamicTypeSize(.xSmall ... .accessibility1)
-//                
-//            }
-//            .contentShape(Rectangle())
-//            .transition(AnyTransition.move(edge: .bottom))
-//    }
-    
-    
     var body: some View {
         GeometryReader { proxy in
-            // 1) Background that never intercepts touches
             ZStack {
                 blurryBackground(url: viewModel.selectedNasheed?.imageURL ?? "")
                     .ignoresSafeArea()
-                    .allowsHitTesting(false)   // 👈 critical
+                    .allowsHitTesting(false)
                     .zIndex(0)
             }
 
-            // 2) Your actual content on top
             VStack(alignment: .center, spacing: 0) {
                 upperControllers(safeAreaTopInset: proxy.safeAreaInsets.top)
                 Spacer()
@@ -68,14 +37,12 @@ struct PlayingDetailView: View {
             }
             .minimumScaleFactor(dynamicTypeSize.customMinScaleFactor)
             .dynamicTypeSize(.xSmall ... .accessibility1)
-            .zIndex(1) // 👈 keep content above anything else
+            .zIndex(1)
         }
         .transition(.move(edge: .bottom))
     }
-
-
-    
 }
+
 
 
 //MARK: - Preview

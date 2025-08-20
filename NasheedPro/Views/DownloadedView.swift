@@ -13,6 +13,7 @@ struct DownloadedView: View {
     @EnvironmentObject private var viewModel: NasheedViewModel
     @Binding var selectedNasheed: NasheedModel?
     
+    
     var icon: String {
         if #available(iOS 16, *) {
             "bookmark.slash.fill"
@@ -23,6 +24,7 @@ struct DownloadedView: View {
     }
     
     var body: some View {
+        
         NavigationStack {
             ListVIew(
                 title: "Downloads",
@@ -31,23 +33,14 @@ struct DownloadedView: View {
                 emptyDescription: "Download a nasheed to see it here.",
                 nasheedsOf: Array(viewModel.filteredNasheeds),
                 
-                
-                onMove: viewModel.moveDownloaded,
                 onDelete: viewModel.deleteDownloaded,
                 selectedNasheed: $selectedNasheed
                 
             )
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    EditModeButton()
-                        .disabled(viewModel.baseNasheeds.isEmpty)
-                }
-            }
         }
-        .onAppear {
-            viewModel.currentScope = .downloaded
-        }
- 
+   
+        .onAppear { viewModel.currentScope = .downloaded }
+        
     }
 }
 
@@ -58,6 +51,8 @@ struct DownloadedView: View {
     .environmentObject(dev.nasheedVM)
     .environmentObject(MinimizableViewHandler())
 }
+
+
 
     
 

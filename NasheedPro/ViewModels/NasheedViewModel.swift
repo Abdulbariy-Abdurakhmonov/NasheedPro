@@ -15,34 +15,26 @@ final class NasheedViewModel: ObservableObject {
     
     @Published var downloadStates: [String: DownloadButtonView.DownloadState] = [:]
     @Published var downloadedNasheeds: [DownloadedNasheedModel] = []
-    
     @Published var likedNasheeds: [NasheedModel] = []
     @Published var nasheeds: [NasheedModel] = []
     @Published var selectedNasheed: NasheedModel?
-    
     @Published var searchMode: SearchMode = .title
     @Published var searchText: String = ""
     @Published var isLoading = false
     @Published var errorMessage: String?
     @Published var isLiked: Bool = false
     @Published var currentScope: ScopeType = .all
-    
-    @Published private(set) var debouncedText: String = ""  // <- for debounce
+    @Published private(set) var debouncedText: String = ""
 
-    private var cancellables = Set<AnyCancellable>() // <- for Combine
-    
-//    @Published private var
-    
+    private var cancellables = Set<AnyCancellable>()
+
     let service = MediaService()
     let likeService = LikePersistingService()
     private let firebaseService = FirebaseService()
     let haptic = HapticManager.shared
     private let downloadService = DownloadService()
    
-
- 
     enum ScopeType { case all, liked, downloaded }
-    
     enum SearchMode { case reciter, title }
     
     init() {
@@ -140,16 +132,6 @@ final class NasheedViewModel: ObservableObject {
         return downloadedNasheeds.contains(where: { $0.id == nasheed.id }) ? .downloaded : .notDownloaded
     }
     
-    
-    func moveDownloaded(from source: IndexSet, to destination: Int) {
-          downloadedNasheeds.move(fromOffsets: source, toOffset: destination)
-          do {
-              try downloadService.saveDownloads(downloadedNasheeds)
-          } catch {
-              print("Failed to save reordered downloads: \(error)")
-          }
-      }
-    
       
       func deleteDownloaded(at offsets: IndexSet) {
           let toDelete = offsets.map { downloadedNasheeds[$0] }
@@ -167,6 +149,9 @@ final class NasheedViewModel: ObservableObject {
           downloadedNasheeds.remove(atOffsets: offsets)
           loadDownloadedNasheeds()
       }
+    
+    
+ 
 
     
     

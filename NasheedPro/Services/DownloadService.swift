@@ -172,6 +172,16 @@ final class DownloadService: NSObject, URLSessionDownloadDelegate {
         try data.write(to: downloadsDirectory.appendingPathComponent("downloads.json"))
     }
     
+    func isDownloaded(id: String, in list: [DownloadedNasheedModel]) -> DownloadedNasheedModel? {
+        guard let item = list.first(where: { $0.id == id }) else { return nil }
+        if FileManager.default.fileExists(atPath: item.localAudioURL.path) {
+            return item
+        } else {
+            return nil // file missing → treat as not downloaded (and optionally purge stale entry)
+        }
+    }
+
+    
 }
 
 
