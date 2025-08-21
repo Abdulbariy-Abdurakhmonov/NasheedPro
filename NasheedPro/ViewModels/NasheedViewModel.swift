@@ -68,34 +68,38 @@ final class NasheedViewModel: ObservableObject {
         case .liked:
             return likedNasheeds
         case .downloaded:
-            return  downloadedNasheeds.compactMap { local in
-                NasheedModel(
+            return downloadedNasheeds.compactMap { local in
+                let audioURL = localFilePath(for: local.audioFileName)
+                let imageURL = localFilePath(for: local.imageFileName)
+                
+                return NasheedModel(
                     id: local.id,
                     title: local.title,
                     reciter: local.reciter,
-                    imageURL: local.localImageURL.absoluteString,
-                    audioURL: local.localAudioURL.absoluteString,
+                    imageURL: imageURL.absoluteString,
+                    audioURL: audioURL.absoluteString,
                     isDownloaded: true
                 )
             }
-//
         }
     }
     
     
     var filtererDownloadings: [NasheedModel] {
-        return  downloadedNasheeds.compactMap { local in
-            NasheedModel(
+        return downloadedNasheeds.compactMap { local in
+            let audioURL = localFilePath(for: local.audioFileName)
+            let imageURL = localFilePath(for: local.imageFileName)
+            
+            return NasheedModel(
                 id: local.id,
                 title: local.title,
                 reciter: local.reciter,
-                imageURL: local.localImageURL.absoluteString,
-                audioURL: local.localAudioURL.absoluteString,
+                imageURL: imageURL.absoluteString,
+                audioURL: audioURL.absoluteString,
                 isDownloaded: true
             )
         }
     }
-    
     
     
     var filteredNasheeds: [NasheedModel] {
@@ -169,8 +173,20 @@ final class NasheedViewModel: ObservableObject {
                     }
                 )
                 
+                
+                let downloadedModel = DownloadedNasheedModel(
+                    id: downloaded.id,
+                    title: downloaded.title,
+                    reciter: downloaded.reciter,
+                    audioFileName: downloaded.localAudioURL.lastPathComponent,
+                    imageFileName: downloaded.localImageURL.lastPathComponent,
+                    downloadedAt: Date()
+                )
+                
+                
+                
                 await MainActor.run {
-                    self.downloadedNasheeds.append(downloaded)
+                    self.downloadedNasheeds.append(downloadedModel)
                     self.downloadStates[nasheed.id] = .finished
                     haptic.generator.notificationOccurred(.success)
 
@@ -190,6 +206,7 @@ final class NasheedViewModel: ObservableObject {
                 }
             }
         }
+        
 
     }
 
@@ -255,6 +272,11 @@ final class NasheedViewModel: ObservableObject {
         }
     }
 
+
+    private func localFilePath(for fileName: String) -> URL {
+        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        return documentsDirectory.appendingPathComponent("Downloads").appendingPathComponent(fileName)
+    }
 
     
     

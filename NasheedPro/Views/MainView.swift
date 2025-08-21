@@ -56,7 +56,7 @@ extension MainView {
                     .disabled(!network.isConnected)
                     .overlay {
                         if !network.isConnected {
-                            Color.black.opacity(0.3)
+                            Color.black.opacity(0.2)
                                 .allowsHitTesting(false)
                         }
                     }
@@ -71,6 +71,13 @@ extension MainView {
             
             NavigationView {
                 LikedView(selectedNasheed: $selectedNasheed)
+                    .disabled(!network.isConnected)
+                    .overlay {
+                        if !network.isConnected {
+                            Color.black.opacity(0.2)
+                                .allowsHitTesting(false)
+                        }
+                    }
             }
             .tabItem {
                 Image(systemName: "heart.fill")
@@ -110,6 +117,7 @@ extension MainView {
             dragEnded: { value in miniVM.dragOnEnded(value: value) }
         )
     }
+    
     
     
 }

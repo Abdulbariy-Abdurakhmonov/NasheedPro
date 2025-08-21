@@ -36,14 +36,14 @@ final class DownloadService: NSObject, URLSessionDownloadDelegate {
     ) async throws -> DownloadedNasheedModel {
         
         // Download audio
-        let audioURL = try await downloadFile(
+        _ = try await downloadFile(
             from: nasheed.audioURL,
             name: "\(nasheed.id).mp3",
             progressHandler: progressHandler
         )
         
-        // Download image (we won’t track progress for this small file)
-        let imageURL = try await downloadFile(
+        
+        _ = try await downloadFile(
             from: nasheed.imageURL,
             name: "\(nasheed.id).jpg"
         )
@@ -52,8 +52,8 @@ final class DownloadService: NSObject, URLSessionDownloadDelegate {
             id: nasheed.id,
             title: nasheed.title,
             reciter: nasheed.reciter,
-            localAudioURL: audioURL,
-            localImageURL: imageURL,
+            audioFileName: "\(nasheed.id).mp3",
+            imageFileName: "\(nasheed.id).jpg",
             downloadedAt: Date()
         )
 
@@ -177,7 +177,7 @@ final class DownloadService: NSObject, URLSessionDownloadDelegate {
         if FileManager.default.fileExists(atPath: item.localAudioURL.path) {
             return item
         } else {
-            return nil // file missing → treat as not downloaded (and optionally purge stale entry)
+            return nil 
         }
     }
 

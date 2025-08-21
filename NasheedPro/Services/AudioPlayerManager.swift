@@ -10,7 +10,7 @@ import SwiftUI
 import AVFoundation
 
 class AudioPlayerManager: ObservableObject {
-        
+    
     
     @Published var isRepeatEnabled: Bool = false
     @Published var timer: Timer?
@@ -38,7 +38,7 @@ class AudioPlayerManager: ObservableObject {
         }
         
         sleepTimer.isPlaying = { [weak self] in
-             self?.isPlaying == true
+            self?.isPlaying == true
         }
     }
     
@@ -55,7 +55,7 @@ class AudioPlayerManager: ObservableObject {
         }
     }
     
-
+    
     func play(player: AVPlayer) {
         player.play()
         isPlaying = true
@@ -99,7 +99,7 @@ class AudioPlayerManager: ObservableObject {
         player.seek(to: CMTime(seconds: newTime, preferredTimescale: 600))
         progress = newTime
     }
-
+    
     
     func formatTime(_ time: Double) -> String {
         let minutes = Int(time) / 60
@@ -113,45 +113,98 @@ class AudioPlayerManager: ObservableObject {
         guard allNasheeds.indices.contains(nextIndex) else { return }
         loadAndPlay(nasheeds: allNasheeds, index: nextIndex)
     }
-
+    
     
     func playPrevious() {
         let prevIndex = currentIndex - 1
         guard allNasheeds.indices.contains(prevIndex) else { return }
         loadAndPlay(nasheeds: allNasheeds, index: prevIndex)
     }
-
+    
+    
+    func localFilePath(for fileName: String) -> URL {
+        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        return documentsDirectory.appendingPathComponent("Downloads").appendingPathComponent(fileName)
+    }
+    
     
     
     func loadAndPlay(nasheeds: [NasheedModel], index: Int) {
-        guard nasheeds.indices.contains(index),
-              let url = URL(string: nasheeds[index].audioURL) else { return }
-                
+        guard nasheeds.indices.contains(index) else { return }
+        
+        let nasheed = nasheeds[index]
         self.allNasheeds = nasheeds
         self.currentIndex = index
-
+        
         DispatchQueue.main.async {
-            self.onNasheedChange?(nasheeds[index])
+            self.onNasheedChange?(nasheed)
         }
-        loadAndPlay(url: url)
+        
+        
+        
+        if nasheed.isDownloaded {
+            if let localNasheed = NasheedViewModel().downloadedNasheeds.first(where: { $0.id == nasheed.id }) {
+                let fileURL = localNasheed.localAudioURL
+                loadAndPlay(url: fileURL)
+            }
+        } else {
+            if let remoteURL = URL(string: nasheed.audioURL) {
+                loadAndPlay(url: remoteURL)
+            }
+        }
+        
+        
     }
-
     
     
-    //new trial
+    
+    
+    
     func loadAndPlay(url: URL) {
-        // Stop any current playback
         player?.pause()
         timer?.invalidate()
         isPlayerReady = false
         progress = 0
         totalDuration = 0
         
-        // Create a new player
-        let playerItem = AVPlayerItem(url: url)
+        if url.isFileURL {
+            if FileManager.default.fileExists(atPath: url.path) {
+                print("✅ File exists at: \(url.path)")
+            } else {
+                print("❌ File does not exist at: \(url.path)")
+            }
+        }
+        
+        
+        if url.isFileURL {
+            do {
+                let attributes = try FileManager.default.attributesOfItem(atPath: url.path)
+                if let fileSize = attributes[.size] as? NSNumber {
+                    print("📦 File size: \(fileSize.intValue / 1024) KB")
+                }
+            } catch {
+                print("⚠️ Failed to get file size: \(error.localizedDescription)")
+            }
+        }
+        
+        
+        
+        let asset = AVURLAsset(url: url)
+        let playerItem = AVPlayerItem(asset: asset)
         player = AVPlayer(playerItem: playerItem)
         
-        // Handle playback finished
+        
+        NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemFailedToPlayToEndTime,
+            object: nil,
+            queue: .main
+        ) { notification in
+            if let error = notification.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? NSError {
+                print("🚨 Player failed: \(error)")
+            }
+        }
+        
+        
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
         NotificationCenter.default.addObserver(
             self,
@@ -160,18 +213,14 @@ class AudioPlayerManager: ObservableObject {
             object: playerItem
         )
         
-        // Load duration asynchronously before starting
-        
-        
-        
         Task {
             do {
-                let duration = try await playerItem.asset.load(.duration)
+                let duration = try await asset.load(.duration)
                 await MainActor.run { [weak self] in
                     guard let self = self else { return }
                     self.totalDuration = CMTimeGetSeconds(duration)
                     self.isPlayerReady = true
-                    self.isPlaying = true // update BEFORE starting playback so UI updates instantly
+                    self.isPlaying = true
                     self.player?.play()
                 }
             } catch {
@@ -179,7 +228,6 @@ class AudioPlayerManager: ObservableObject {
             }
         }
         
-
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             guard let self = self else { return }
             if let currentTime = self.player?.currentTime() {
@@ -191,10 +239,8 @@ class AudioPlayerManager: ObservableObject {
             }
         }
     }
-
-
     
-
+    
     
     func seek(to time: Double) {
         let cmTime = CMTime(seconds: time, preferredTimescale: 1)
@@ -203,38 +249,37 @@ class AudioPlayerManager: ObservableObject {
     }
     
     
+    
     func togglePlayPause(url: URL) {
         if isPlaying {
             pause()
         } else {
+            let isFileURL = url.isFileURL
+            
             if let currentAsset = player?.currentItem?.asset as? AVURLAsset {
                 if currentAsset.url != url {
-                    player = AVPlayer(url: url)
-                    progress = 0 // reset progress for new track
+                    player = AVPlayer(url: isFileURL ? url : url)
+                    progress = 0
                 }
             } else {
-                
-                player = AVPlayer(url: url)
+                player = AVPlayer(url: isFileURL ? url : url)
             }
             
             if let player = player {
                 play(player: player)
             }
             
-            
             Task {
                 do {
                     if let duration = try await player?.currentItem?.asset.load(.duration) {
                         await MainActor.run { [weak self] in
                             self?.totalDuration = CMTimeGetSeconds(duration)
-                            
                         }
                     }
                 } catch {
                     print("Failed to load duration:", error)
                 }
             }
-            
             
             timer?.invalidate()
             timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
@@ -249,8 +294,17 @@ class AudioPlayerManager: ObservableObject {
             }
         }
     }
-    
+}
 
+
+extension DownloadedNasheedModel {
+    var localAudioURL: URL {
+        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        return documentsDirectory.appendingPathComponent("Downloads").appendingPathComponent(audioFileName)
+    }
     
-    
+    var localImageURL: URL {
+        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        return documentsDirectory.appendingPathComponent("Downloads").appendingPathComponent(imageFileName)
+    }
 }
