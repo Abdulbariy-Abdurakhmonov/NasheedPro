@@ -41,6 +41,12 @@ struct NasheedRowView: View {
                        
             Spacer()
             
+            if viewModel.selectedNasheed?.id == nasheed.id {
+                NowPlayingIndicator(isPlaying: AudioPlayerManager().isPlaying)
+                    .frame(height: 20)
+            }
+                
+            
             DownloadButtonView(
                 state: viewModel.stateFor(nasheed),
                 action: { viewModel.downloadNasheed(nasheed) }
@@ -58,4 +64,5 @@ struct NasheedRowView: View {
 
 #Preview {
     NasheedRowView(nasheed: dev.mockData)
+        .environmentObject(NasheedViewModel())
 }

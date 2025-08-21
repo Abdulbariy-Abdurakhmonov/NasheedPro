@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import AVFoundation
+import MediaPlayer
 
 class AudioPlayerManager: ObservableObject {
     
@@ -21,7 +22,7 @@ class AudioPlayerManager: ObservableObject {
     
     let sleepTimer = SleepTimerManager()
     static let shared = AudioPlayerManager()
-    private var player: AVPlayer?
+    var player: AVPlayer?
     
     @Published var isPlaying = true
     @Published var allNasheeds: [NasheedModel] = []
@@ -33,6 +34,10 @@ class AudioPlayerManager: ObservableObject {
     
     
     init() {
+        
+        configureAudioSession()
+        setupRemoteTransportControls()
+        
         sleepTimer.onSleepTimeout = { [weak self] in
             self?.pause()
         }
@@ -44,6 +49,14 @@ class AudioPlayerManager: ObservableObject {
     
     
     
+    private func configureAudioSession() {
+           do {
+               try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
+               try AVAudioSession.sharedInstance().setActive(true)
+           } catch {
+               print("Failed to configure audio session: \(error)")
+           }
+       }
     
     
     @objc private func playerDidFinishPlaying() {
@@ -75,7 +88,7 @@ class AudioPlayerManager: ObservableObject {
     
     func stop() {
         player?.pause()
-        player?.replaceCurrentItem(with: nil)  // Clears the current item
+        player?.replaceCurrentItem(with: nil)
         timer?.invalidate()
         progress = 0
         isPlaying = false
@@ -127,7 +140,7 @@ class AudioPlayerManager: ObservableObject {
         return documentsDirectory.appendingPathComponent("Downloads").appendingPathComponent(fileName)
     }
     
-    
+//    -----
     
     func loadAndPlay(nasheeds: [NasheedModel], index: Int) {
         guard nasheeds.indices.contains(index) else { return }
@@ -140,7 +153,9 @@ class AudioPlayerManager: ObservableObject {
             self.onNasheedChange?(nasheed)
         }
         
-        
+
+     
+        setNowPlaying(for: nasheed)
         
         if nasheed.isDownloaded {
             if let localNasheed = NasheedViewModel().downloadedNasheeds.first(where: { $0.id == nasheed.id }) {
@@ -157,6 +172,46 @@ class AudioPlayerManager: ObservableObject {
     }
     
     
+//    func resizeToSquare(image: UIImage, size: CGFloat = 400) -> UIImage {
+//        let squareSize = CGSize(width: size, height: size)
+//        let renderer = UIGraphicsImageRenderer(size: squareSize)
+//        return renderer.image { _ in
+//            image.draw(in: CGRect(origin: .zero, size: squareSize))
+//        }
+//    }
+
+    
+    
+    func setNowPlaying(for nasheed: NasheedModel) {
+        let title = nasheed.title
+        let artist = nasheed.reciter
+        
+        if nasheed.isDownloaded {
+            if let localNasheed = NasheedViewModel().downloadedNasheeds.first(where: { $0.id == nasheed.id }) {
+                let fileURL = localNasheed.localImageURL
+                if let data = try? Data(contentsOf: fileURL), let image = UIImage(data: data) {
+                    updateNowPlayingInfo(title: title, artist: artist, artwork: image)
+                    return
+                }
+            }
+        }
+        
+        
+        if let url = URL(string: nasheed.imageURL) {
+            URLSession.shared.dataTask(with: url) { data, _, _ in
+                var artwork: UIImage? = nil
+                if let data = data {
+                    artwork = UIImage(data: data)
+                }
+                DispatchQueue.main.async {
+                    self.updateNowPlayingInfo(title: title, artist: artist, artwork: artwork)
+                }
+            }.resume()
+        } else {
+            updateNowPlayingInfo(title: title, artist: artist, artwork: nil)
+        }
+    }
+
     
     
     
@@ -213,6 +268,19 @@ class AudioPlayerManager: ObservableObject {
             object: playerItem
         )
         
+        
+        player?.addPeriodicTimeObserver(
+            forInterval: CMTime(seconds: 1, preferredTimescale: 1),
+            queue: .main
+        ) { [weak self] time in
+            guard let self = self else { return }
+            var nowPlayingInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
+            nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = time.seconds
+            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = self.player?.rate ?? 0
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+        }
+        
+        
         Task {
             do {
                 let duration = try await asset.load(.duration)
@@ -238,6 +306,10 @@ class AudioPlayerManager: ObservableObject {
                 self.isPlaying = false
             }
         }
+        
+        
+        
+        
     }
     
     
@@ -247,6 +319,8 @@ class AudioPlayerManager: ObservableObject {
         player?.seek(to: cmTime)
         progress = time
     }
+    
+    
     
     
     
