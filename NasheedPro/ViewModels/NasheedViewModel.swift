@@ -220,7 +220,6 @@ final class NasheedViewModel: ObservableObject {
 
                    var updated = fetched
 
-                   // Restore liked state from Core Data (off-main-thread is OK)
                    let likedIds = likeService.likedEntities.compactMap { $0.likedID }
                    for index in updated.indices {
                        if likedIds.contains(updated[index].id) {
@@ -228,7 +227,7 @@ final class NasheedViewModel: ObservableObject {
                        }
                    }
                    
-                   let safeUpdated = updated  // Immutable copy
+                   let safeUpdated = updated
                    
                    await MainActor.run {
                        self.nasheeds = safeUpdated

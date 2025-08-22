@@ -23,7 +23,7 @@ struct ListVIew: View {
     @Binding var selectedNasheed: NasheedModel?
     @Namespace var namespace
     
-    
+  
     
     var body: some View {
         ZStack {
@@ -70,6 +70,9 @@ extension ListVIew {
         ForEach(nasheedsOf) { nasheed in
             NasheedRowView(nasheed: nasheed)
                 .contentShape(Rectangle())
+                .listRowBackground(
+                    viewModel.selectedNasheed?.id == nasheed.id ? Color.accent.opacity(0.25): .clear
+                ).cornerRadius(12)
                 .onTapGesture {
                     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                     DispatchQueue.main.async {
@@ -94,10 +97,12 @@ extension ListVIew {
                     }
                     
                 }
-                .padding(.trailing, 20)
+                .padding(.trailing, 4)
         }
+        
+        
         .onDelete(perform: onDelete)
-        .listSectionSeparator(.hidden, edges: .all)
+        
     }
     
     
@@ -109,22 +114,19 @@ extension ListVIew {
                     Section {
                         contentUnavailableView()
                             .frame(maxWidth: .infinity, minHeight: 300)
-                            .listRowSeparator(.hidden)
                             .listRowBackground(Color.clear)
                     }
                 } else if viewModel.filteredNasheeds.isEmpty && !viewModel.searchText.isEmpty {
                     Section {
                         UnavailableView(searchResult: viewModel.searchText)
                             .frame(maxWidth: .infinity, minHeight: 300)
-                            .listRowSeparator(.hidden)
                             .listRowBackground(Color.clear)
                     }
                 } else {
                     listParts
                 }
             }
-            .scrollIndicators(.hidden)
-            .listStyle(.insetGrouped)
+            .listStyle(.grouped)
             .safeAreaInset(edge: .bottom) {
                 Color.clear.frame(height: miniHandler.isMinimized ? 65 : 0)
             }

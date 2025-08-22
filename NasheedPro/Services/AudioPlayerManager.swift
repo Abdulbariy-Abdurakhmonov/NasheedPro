@@ -170,17 +170,7 @@ class AudioPlayerManager: ObservableObject {
         
         
     }
-    
-    
-//    func resizeToSquare(image: UIImage, size: CGFloat = 400) -> UIImage {
-//        let squareSize = CGSize(width: size, height: size)
-//        let renderer = UIGraphicsImageRenderer(size: squareSize)
-//        return renderer.image { _ in
-//            image.draw(in: CGRect(origin: .zero, size: squareSize))
-//        }
-//    }
-
-    
+        
     
     func setNowPlaying(for nasheed: NasheedModel) {
         let title = nasheed.title

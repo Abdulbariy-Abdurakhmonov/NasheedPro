@@ -9,12 +9,11 @@ import SwiftUI
 
 struct NasheedRowView: View {
     
-//    @ObservedObject var nasheed: NasheedModel
-    
     
     let nasheed: NasheedModel
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
     @EnvironmentObject var viewModel: NasheedViewModel
+    @ObservedObject var audioPlayer = AudioPlayerManager.shared
     
     
     var body: some View {
@@ -28,6 +27,7 @@ struct NasheedRowView: View {
             
             VStack(alignment: .leading) {
                 Text(nasheed.title)
+                    .foregroundStyle(.primary)
                     .scaledFont(name: "Rounded", size: 22)
                     .fontDesign(.serif)
                     
@@ -40,21 +40,19 @@ struct NasheedRowView: View {
             }
                        
             Spacer()
-            
-            if viewModel.selectedNasheed?.id == nasheed.id {
-                NowPlayingIndicator(isPlaying: AudioPlayerManager().isPlaying)
-                    .frame(height: 20)
-            }
-                
+      
             
             DownloadButtonView(
                 state: viewModel.stateFor(nasheed),
                 action: { viewModel.downloadNasheed(nasheed) }
             )
-
-
-                
-                
+            
+             
+            NowPlayingIndicator(isPlaying: $audioPlayer.isPlaying, isPlayerReady: $audioPlayer.isPlayerReady)
+                    .frame(height: 16)
+                    .padding(.leading, 4)
+                    .opacity(viewModel.selectedNasheed?.id == nasheed.id ? 1 : 0)
+    
         }
         .dynamicTypeSize(.xSmall ... .accessibility1)
         
