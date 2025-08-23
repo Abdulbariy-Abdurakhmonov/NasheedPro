@@ -34,8 +34,9 @@ extension AudioPlayerManager {
                 info[MPNowPlayingInfoPropertyPlaybackRate] = player.rate
 
                 if let artwork = artwork {
-                    let resized = resizeAndRound(image: artwork, size: 250)
+                    let resized = makeArtwork(image: artwork, targetSize: 500, cornerRadius: 0)
                     info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: resized.size) { _ in resized }
+
                 }
 
                 MPNowPlayingInfoCenter.default().nowPlayingInfo = info
@@ -45,15 +46,42 @@ extension AudioPlayerManager {
 
     
 
-    func resizeAndRound(image: UIImage, size: CGFloat) -> UIImage {
-        let squareSize = CGSize(width: size, height: size)
+//    func resizeAndRound(image: UIImage, size: CGFloat) -> UIImage {
+//        let squareSize = CGSize(width: size, height: size)
+//        let renderer = UIGraphicsImageRenderer(size: squareSize)
+//        return renderer.image { _ in
+//            let rect = CGRect(origin: .zero, size: squareSize)
+//            
+//            image.draw(in: rect)
+//        }
+//    }
+    
+    
+    func makeArtwork(image: UIImage, targetSize: CGFloat, cornerRadius: CGFloat = 0) -> UIImage {
+        let squareSize = CGSize(width: targetSize, height: targetSize)
         let renderer = UIGraphicsImageRenderer(size: squareSize)
+
         return renderer.image { _ in
-            let rect = CGRect(origin: .zero, size: squareSize)
-            
+            let aspect = max(targetSize / image.size.width, targetSize / image.size.height)
+            let newSize = CGSize(width: image.size.width * aspect,
+                                 height: image.size.height * aspect)
+
+            let x = (targetSize - newSize.width) / 2
+            let y = (targetSize - newSize.height) / 2
+            let rect = CGRect(origin: CGPoint(x: x, y: y), size: newSize)
+
+            // Clip to rounded rect (like DetailView cornerRadius)
+            let path = UIBezierPath(roundedRect: CGRect(origin: .zero, size: squareSize),
+                                    cornerRadius: cornerRadius)
+            path.addClip()
+
             image.draw(in: rect)
         }
     }
+
+
+    
+    
     
     func setupRemoteTransportControls() {
           let commandCenter = MPRemoteCommandCenter.shared()

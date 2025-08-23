@@ -64,7 +64,8 @@ extension PlayingDetailView {
     private func upperControllers(safeAreaTopInset: CGFloat) -> some View {
         VStack {
             Capsule()
-                .fill(Color.gray.opacity(0.35))
+//                .fill(Color.gray.opacity(0.35))
+                .fill(Color.secondary.opacity(0.35))
                 .frame(width: 40, height: 5)
                 .padding(.top, safeAreaTopInset + 10)
             
@@ -78,32 +79,34 @@ extension PlayingDetailView {
                 }) {
                     Image(systemName: "chevron.down")
                         .font(.system(size: 24))
-                        .foregroundColor(.accent)
+                        .foregroundColor(.accent.opacity(0.85))
+//                        .foregroundStyle(Color.secondary.opacity(0.8))
                         .fontWeight(.medium)
-                }.padding(.horizontal, 10)
+                }.padding(.horizontal, 15)
+                    .contentShape(Rectangle())
                     .frame(width: self.miniHandler.isMinimized == false ? nil : 0, height: self.miniHandler.isMinimized == false ? nil : 0)
                 
                 Spacer()
                 
-                Button(action: {
-                    
-                    withAnimation {
-                        self.miniHandler.dismiss()
-                    }
-                    
-                    AudioPlayerManager.shared.stop()
-                    AudioPlayerManager.shared.isRepeatEnabled = false
-                    AudioPlayerManager.shared.sleepTimer.cancelSleepTimer()
-                    
-                }) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 20))
-                        .foregroundColor(.accent)
-                        .fontWeight(.medium)
-                    
-                }
-                .padding(.trailing, 10)
-                    .frame(width: self.miniHandler.isMinimized == false ? nil : 0, height: self.miniHandler.isMinimized == false ? nil : 0)
+//                Button(action: {
+//                    
+//                    withAnimation {
+//                        self.miniHandler.dismiss()
+//                    }
+//                    
+//                    AudioPlayerManager.shared.stop()
+//                    AudioPlayerManager.shared.isRepeatEnabled = false
+//                    AudioPlayerManager.shared.sleepTimer.cancelSleepTimer()
+//                    
+//                }) {
+//                    Image(systemName: "xmark")
+//                        .font(.system(size: 20))
+//                        .foregroundColor(.accent)
+//                        .fontWeight(.medium)
+//                    
+//                }
+//                .padding(.trailing, 10)
+//                .frame(width: self.miniHandler.isMinimized == false ? nil : 0, height: self.miniHandler.isMinimized == false ? nil : 0)
             }.frame(width: self.miniHandler.isMinimized == false ? nil : 0, height: self.miniHandler.isMinimized == false ? nil : 0)
                 .padding(.horizontal, 10)
                 .minimumScaleFactor(dynamicTypeSize.customMinScaleFactor)

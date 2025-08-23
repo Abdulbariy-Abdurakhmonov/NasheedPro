@@ -87,7 +87,7 @@ extension PlayControllerView {
                                     }
                         )
                 }
-                .contentShape(Rectangle()) // Make the entire area tappable
+                .contentShape(Rectangle())
                 .onTapGesture { location in
                     let newProgress = min(max(0, location.x / sliderWidth * player.totalDuration), player.totalDuration)
                     player.seek(to: newProgress)
@@ -118,6 +118,8 @@ extension PlayControllerView {
                 Button {
                     player.rewind15Seconds()
                 } label: { ControllButton(icon: "15.arrow.trianglehead.counterclockwise", size: 24, color: primary) }.disabled(!player.isPlayerReady || !player.isPlaying)
+                    .buttonStyle(HighlightButtonStyle())
+                    
                 
                 
                 Button {
@@ -128,13 +130,15 @@ extension PlayControllerView {
                         ControllButton(icon: "arrowtriangle.left.fill", size: 22, color: primary)
                     }
                 }
+                .buttonStyle(HighlightButtonStyle())
                 
                 
                 Button {
                     guard let url = URL(string: viewModel.selectedNasheed?.audioURL ?? "") else { return }
                     player.togglePlayPause(url: url)
                     
-                } label: { ControllButton(icon: player.isPlaying ? "pause.fill" : "play.fill", size: 35, color: primary) }
+                } label: { AnimatedPlayPause(isPlaying: $player.isPlaying) }
+                   
                 
             
                 
@@ -148,10 +152,12 @@ extension PlayControllerView {
                         
                     }
                 }
+                .buttonStyle(HighlightButtonStyle())
                 
                 Button {
                     player.forward15Seconds()
-                } label: { ControllButton(icon: "15.arrow.trianglehead.clockwise", size: 24, color: primary) }.disabled(!player.isPlayerReady || !player.isPlaying)
+                } label: { ControllButton(icon: "15.arrow.trianglehead.clockwise", size: 24, color: primary) }.disabled(!player.isPlayerReady)
+                    .buttonStyle(HighlightButtonStyle())
             }.overlay(content: {
                 if !player.isPlayerReady {
                        ProgressView()

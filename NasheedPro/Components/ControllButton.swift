@@ -30,3 +30,6 @@ struct ControllButton: View {
     ControllButton(icon: "info.circle", size: 24, color: primary)
         
 }
+
+
+

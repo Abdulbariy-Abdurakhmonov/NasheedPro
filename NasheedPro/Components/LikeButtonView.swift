@@ -11,7 +11,7 @@ struct LikeButtonView: View {
 
     @EnvironmentObject var viewModel: NasheedViewModel
     
-    @State private var heartStyle: AnyShapeStyle = AnyShapeStyle(Color.gray)
+    @State private var heartStyle: AnyShapeStyle = AnyShapeStyle(Color.secondary)
     @State private var animate = false
     @State private var wasTapped = false
     @State private var isLiked: Bool = false
@@ -24,7 +24,7 @@ struct LikeButtonView: View {
         Image(systemName: viewModel.selectedNasheed?.isLiked ?? false ? "heart.fill" : "heart")
             .scaledFont(name: "", size: 25)
             .foregroundStyle(heartStyle)
-            .scaleEffect(animate ? 1.4 : 1.0)
+            .scaleEffect(animate ? 1.5 : 1.0)
             .onTapGesture {
                 wasTapped = true
                 tapAction()
@@ -34,12 +34,12 @@ struct LikeButtonView: View {
                     triggerLikeAnimation()
                 } else {
                     
-                    heartStyle = AnyShapeStyle(Color.gray)
+                    heartStyle = AnyShapeStyle(Color.secondary)
                 }
             }
             .onAppear {
                 isLiked = viewModel.selectedNasheed?.isLiked ?? false
-                heartStyle = isLiked ? AnyShapeStyle(Color.red) : AnyShapeStyle(Color.gray)
+                heartStyle = isLiked ? AnyShapeStyle(Color.red) : AnyShapeStyle(Color.secondary)
             }
             .onChange(of: viewModel.selectedNasheed) { _, newValue in
                 isLiked = newValue?.isLiked ?? false
@@ -48,7 +48,7 @@ struct LikeButtonView: View {
                     return 
                 }
                 
-                heartStyle = isLiked ? AnyShapeStyle(Color.red) : AnyShapeStyle(Color.gray)
+                heartStyle = isLiked ? AnyShapeStyle(Color.red) : AnyShapeStyle(Color.secondary)
             }
             .animation(.easeOut(duration: 0.3), value: animate)
     }
