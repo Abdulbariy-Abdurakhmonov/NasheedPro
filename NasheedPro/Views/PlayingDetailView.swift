@@ -80,7 +80,6 @@ extension PlayingDetailView {
                     Image(systemName: "chevron.down")
                         .font(.system(size: 24))
                         .foregroundColor(.accent.opacity(0.85))
-//                        .foregroundStyle(Color.secondary.opacity(0.8))
                         .fontWeight(.medium)
                 }.padding(.horizontal, 15)
                     .contentShape(Rectangle())
@@ -88,6 +87,7 @@ extension PlayingDetailView {
                 
                 Spacer()
                 
+                //X button
 //                Button(action: {
 //                    
 //                    withAnimation {

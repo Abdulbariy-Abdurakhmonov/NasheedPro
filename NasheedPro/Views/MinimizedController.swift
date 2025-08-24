@@ -15,26 +15,25 @@ struct MinimizedController: View {
     
     
     var body: some View {
-        HStack(spacing: 0){
+        HStack(spacing: 12){
             
             Spacer()
             
-            Button(action: {
-                guard let url = URL(string: viewModel.selectedNasheed?.audioURL ?? "") else { return }
-//                AudioPlayerManager.shared.togglePlayPause(url: url)
+            Button { guard let url = URL(string: viewModel.selectedNasheed?.audioURL ?? "") else { return }
                 player.togglePlayPause(url: url)
+            } label: { AnimatedPlayPause(isPlaying: $player.isPlaying, size: 23)}
+                .contentShape(Rectangle())
                 
-            }, label: {
-                ControllButton(icon: player.isPlaying ? "pause.fill" : "play.fill", size: 24, color: primary)
 
-            })
-            
-            Button(action: {
+            Button {
                 player.playNext()
-            }, label: {
-                ControllButton(icon: "forward.fill", size: 24, color: .primary)
-            })
+                
+            } label: {ControllButton(icon: "forward.fill", size: 22, color: player.disabledNextColor())}
+                .disabled(player.isNextDisabled())
+                .buttonStyle(ScaleButtonStyle())
+                
         }
+        .padding(.trailing, 5)
         
     }
 }

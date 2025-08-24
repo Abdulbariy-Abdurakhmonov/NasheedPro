@@ -26,11 +26,34 @@ class AudioPlayerManager: ObservableObject {
     
     @Published var isPlaying = true
     @Published var allNasheeds: [NasheedModel] = []
-    @Published var currentIndex: Int = 0
+    @Published var currentIndex: Int = 0 {
+        didSet {
+            setupRemoteTransportControls()
+        }
+    }
     
     var onNasheedChange: ((NasheedModel) -> Void)?
     
+    @Published var playbackMode: PlaybackMode = .normal {
+        didSet {
+            setupRemoteTransportControls()
+        }
+    }
     
+    
+    enum PlaybackMode: CaseIterable {
+        case normal
+        case repeatAll
+        case repeatOne
+        
+        var iconName: String {
+            switch self {
+            case .normal: return "repeat"
+            case .repeatAll: return "repeat"
+            case .repeatOne: return "repeat.1"
+            }
+        }
+    }
     
     
     init() {
@@ -57,7 +80,7 @@ class AudioPlayerManager: ObservableObject {
                print("Failed to configure audio session: \(error)")
            }
        }
-    
+        
     
     @objc private func playerDidFinishPlaying() {
         if isRepeatEnabled {
@@ -123,15 +146,87 @@ class AudioPlayerManager: ObservableObject {
     
     func playNext() {
         let nextIndex = currentIndex + 1
-        guard allNasheeds.indices.contains(nextIndex) else { return }
-        loadAndPlay(nasheeds: allNasheeds, index: nextIndex)
+        let lastIndex = allNasheeds.count - 1
+
+        
+        switch playbackMode {
+        case .normal:
+            guard allNasheeds.indices.contains(nextIndex) else { return }
+            loadAndPlay(nasheeds: allNasheeds, index: nextIndex)
+        case .repeatAll:
+            if currentIndex == lastIndex {
+                currentIndex = 0
+            } else {
+                currentIndex += 1
+            }
+            loadAndPlay(nasheeds: allNasheeds, index: currentIndex)
+        case .repeatOne:
+            loadAndPlay(nasheeds: allNasheeds, index: currentIndex)
+        }
+    }
+    
+    
+    
+    func disabledNextColor() -> Color {
+        
+        var myColor = Color.primary
+       
+        if playbackMode != .repeatAll && currentIndex == allNasheeds.count - 1 {
+            myColor = Color.secondary.opacity(0.9)
+        } else {
+            myColor = Color.primary
+        }
+        return myColor
+    }
+    
+    
+    func disabledPrevColor() -> Color {
+        
+        var myColor = Color.primary
+       
+        if playbackMode != .repeatAll && currentIndex == 0 { myColor = Color.secondary.opacity(0.9)
+        } else { myColor = Color.primary }
+        
+        return myColor
+    }
+    
+    
+    func setColor() -> Color {
+        return playbackMode == .normal ? Color.secondary : Color.accent.opacity(0.7)
+    }
+    
+    func isNextDisabled() -> Bool {
+        playbackMode != .repeatAll && currentIndex == allNasheeds.count - 1
+    }
+    
+    func isPrevDisabled() -> Bool {
+        playbackMode != .repeatAll && currentIndex == 0
     }
     
     
     func playPrevious() {
-        let prevIndex = currentIndex - 1
-        guard allNasheeds.indices.contains(prevIndex) else { return }
+        var prevIndex = 0
+        if currentIndex > 0 {
+            prevIndex = currentIndex - 1
+        } else if playbackMode == .repeatAll {
+            currentIndex = allNasheeds.count - 1
+            prevIndex = currentIndex
+        }
+  
         loadAndPlay(nasheeds: allNasheeds, index: prevIndex)
+    }
+    
+    
+    
+    func cyclePlaybackMode() {
+        switch playbackMode {
+        case .normal:
+            playbackMode = .repeatAll
+        case .repeatAll:
+            playbackMode = .repeatOne
+        case .repeatOne:
+            playbackMode = .normal
+        }
     }
     
     
@@ -140,7 +235,6 @@ class AudioPlayerManager: ObservableObject {
         return documentsDirectory.appendingPathComponent("Downloads").appendingPathComponent(fileName)
     }
     
-//    -----
     
     func loadAndPlay(nasheeds: [NasheedModel], index: Int) {
         guard nasheeds.indices.contains(index) else { return }

@@ -14,6 +14,13 @@ struct PlayControllerView: View {
     
     let sleepOptions: [TimeInterval] = [10 * 60, 20 * 60, 30 * 60]
     
+    let rewindIcon = "15.arrow.trianglehead.counterclockwise"
+    let previousIcon = "backward.fill"
+    let nextIcon = "forward.fill"
+    let forwardIcon = "15.arrow.trianglehead.clockwise"
+    
+    
+    
     @State private var isRotating = false
     @State private var isRepeatEnabled = false
     
@@ -117,55 +124,43 @@ extension PlayControllerView {
             HStack(spacing: 16) {
                 Button {
                     player.rewind15Seconds()
-                } label: { ControllButton(icon: "15.arrow.trianglehead.counterclockwise", size: 24, color: primary) }.disabled(!player.isPlayerReady || !player.isPlaying)
+                } label: { ControllButton(icon: rewindIcon, size: 24, color: primary) }.disabled(!player.isPlayerReady)
                     .buttonStyle(HighlightButtonStyle())
                     
                 
                 
                 Button {
                     player.playPrevious()
-                } label: {
-                    HStack(spacing: -20) {
-                        ControllButton(icon: "arrowtriangle.left.fill", size: 22, color: primary)
-                        ControllButton(icon: "arrowtriangle.left.fill", size: 22, color: primary)
-                    }
-                }
-                .buttonStyle(HighlightButtonStyle())
+                } label: {ControllButton(icon: previousIcon, size: 22, color: player.disabledPrevColor())}
+                    .disabled(player.isPrevDisabled())
+                    .buttonStyle(HighlightButtonStyle())
                 
                 
-                Button {
-                    guard let url = URL(string: viewModel.selectedNasheed?.audioURL ?? "") else { return }
+                Button { guard let url = URL(string: viewModel.selectedNasheed?.audioURL ?? "") else { return }
                     player.togglePlayPause(url: url)
-                    
-                } label: { AnimatedPlayPause(isPlaying: $player.isPlaying) }
-                   
-                
-            
-                
+                } label: { AnimatedPlayPause(isPlaying: $player.isPlaying, size: 35) }
+                    .buttonStyle(HighlightButtonStyle())
+   
                 Button {
                     player.playNext()
                     
-                } label: {
-                    HStack(spacing: -20) {
-                        ControllButton(icon: "arrowtriangle.right.fill", size: 22, color: primary)
-                        ControllButton(icon: "arrowtriangle.right.fill", size: 22, color: primary)
-                        
-                    }
-                }
-                .buttonStyle(HighlightButtonStyle())
+                } label: {ControllButton(icon: nextIcon, size: 22, color: player.disabledNextColor())}
+                    .disabled(player.isNextDisabled())
+                    .buttonStyle(HighlightButtonStyle())
                 
                 Button {
                     player.forward15Seconds()
-                } label: { ControllButton(icon: "15.arrow.trianglehead.clockwise", size: 24, color: primary) }.disabled(!player.isPlayerReady)
+                } label: { ControllButton(icon: forwardIcon, size: 24, color: primary) }.disabled(!player.isPlayerReady)
                     .buttonStyle(HighlightButtonStyle())
-            }.overlay(content: {
+            }
+            .overlay(content: {
                 if !player.isPlayerReady {
-                       ProgressView()
-                           .progressViewStyle(CircularProgressViewStyle())
-                           .offset(x: -10, y: -35)
-                   }
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle())
+                        .offset(x: -10, y: -35)
+                }
             })
-            
+        
             .padding(.vertical, 26)
             .padding(.bottom, 28)
     }
@@ -182,24 +177,32 @@ extension PlayControllerView {
             .environmentObject(viewModel)
             
             Spacer()
-            
+
             Button {
                 withAnimation(.easeInOut(duration: 0.2)) {
-                        isRepeatEnabled.toggle()
+                    
+                    player.cyclePlaybackMode()
+                    
                         isRotating = true }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {isRotating = false}
-                player.isRepeatEnabled = isRepeatEnabled
+                
             } label: {
-                ControllButton(icon:isRepeatEnabled ? "repeat.1" : "repeat", size: 24,
-                                   color: isRepeatEnabled ? .accent.opacity(0.7): .secondary)
-//                    .rotationEffect(.degrees(isRotating ? 15 : 0))
-                    .scaleEffect(isRotating ? 1.2 : 1)
+                ControllButton(icon: player.playbackMode.iconName, size: 24,
+                               color: player.setColor())
+                    .scaleEffect(isRotating ? 1.3 : 1)
                     .animation(.easeInOut(duration: 0.2), value: isRotating)
 
             }
-            
+              
         }
         .padding(.horizontal, 55)
     }
+    
+    
+    
+    
+  
+    
+    
     
 }

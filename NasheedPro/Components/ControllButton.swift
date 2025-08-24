@@ -12,14 +12,12 @@ struct ControllButton: View {
     
     let icon: String
     let size: CGFloat
-//    let font: Font
     let color: Color
     
     var body: some View {
         Image(systemName: icon)
             .scaledFont(name: "", size: size)
             .minimumScaleFactor(dynamicTypeSize.customMinScaleFactor)
-            .padding(.trailing)
             .foregroundStyle(color)
         
     }

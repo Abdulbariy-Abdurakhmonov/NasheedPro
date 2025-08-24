@@ -44,18 +44,7 @@ extension AudioPlayerManager {
         }
     }
 
-    
 
-//    func resizeAndRound(image: UIImage, size: CGFloat) -> UIImage {
-//        let squareSize = CGSize(width: size, height: size)
-//        let renderer = UIGraphicsImageRenderer(size: squareSize)
-//        return renderer.image { _ in
-//            let rect = CGRect(origin: .zero, size: squareSize)
-//            
-//            image.draw(in: rect)
-//        }
-//    }
-    
     
     func makeArtwork(image: UIImage, targetSize: CGFloat, cornerRadius: CGFloat = 0) -> UIImage {
         let squareSize = CGSize(width: targetSize, height: targetSize)
@@ -69,8 +58,6 @@ extension AudioPlayerManager {
             let x = (targetSize - newSize.width) / 2
             let y = (targetSize - newSize.height) / 2
             let rect = CGRect(origin: CGPoint(x: x, y: y), size: newSize)
-
-            // Clip to rounded rect (like DetailView cornerRadius)
             let path = UIBezierPath(roundedRect: CGRect(origin: .zero, size: squareSize),
                                     cornerRadius: cornerRadius)
             path.addClip()
@@ -85,6 +72,8 @@ extension AudioPlayerManager {
     
     func setupRemoteTransportControls() {
           let commandCenter = MPRemoteCommandCenter.shared()
+        
+
   
           commandCenter.playCommand.addTarget { [weak self] _ in
               self?.player?.play()
@@ -96,15 +85,55 @@ extension AudioPlayerManager {
               return .success
           }
   
-          commandCenter.nextTrackCommand.addTarget { [weak self] _ in
-              self?.playNext()
-              return .success
-          }
+        
+        
+        commandCenter.nextTrackCommand.removeTarget(nil)
+        commandCenter.previousTrackCommand.removeTarget(nil)
+        
+        if !self.isNextDisabled() {
+            commandCenter.nextTrackCommand.isEnabled = true
+            commandCenter.nextTrackCommand.addTarget { [weak self] _ in
+                self?.playNext()
+                return .success
+            }
+        } else {
+            commandCenter.nextTrackCommand.isEnabled = false
+        }
+        
+        
+        
+        if !self.isPrevDisabled() {
+            commandCenter.previousTrackCommand.isEnabled = true
+            commandCenter.previousTrackCommand.addTarget { [weak self] _ in
+                self?.playPrevious()
+                return .success
+            }
+        } else {
+            commandCenter.previousTrackCommand.isEnabled = false
+        }
+        
+        //          commandCenter.nextTrackCommand.addTarget { [weak self] _ in
+        //
+//              
+//              if self?.isNextDisabled() == true {
+//                  commandCenter.nextTrackCommand.isEnabled = false
+//                  return .commandFailed
+//              } else {
+//                  self?.playNext()
+//                  return .success
+//              }
+//    
+//              
+//          }
   
-          commandCenter.previousTrackCommand.addTarget { [weak self] _ in
-              self?.playPrevious()
-              return .success
-          }
+//          commandCenter.previousTrackCommand.addTarget { [weak self] _ in
+//              self?.playPrevious()
+//              return .success
+//          }
+        
+        
+        
+        
         
            commandCenter.changePlaybackPositionCommand.isEnabled = true
            commandCenter.changePlaybackPositionCommand.addTarget { [weak self] event in

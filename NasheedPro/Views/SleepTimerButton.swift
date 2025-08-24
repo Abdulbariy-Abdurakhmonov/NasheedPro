@@ -23,6 +23,7 @@ struct SleepTimerButton: View {
             sleepButton(for: 10 * 60, label: "10 Minutes")
         } label: {
             ControllButton(icon: sleepTManager.isSleepTimerActive ? "moon.zzz.fill" : "moon.zzz", size: 24, color: sleepTManager.isSleepTimerActive ? .accent.opacity(0.7) : .secondary)
+                .padding(.trailing)
                 .animation(.spring(response: 0.5, dampingFraction: 0.7), value: sleepTManager.isSleepTimerActive)
         }
         .overlay {
@@ -50,7 +51,6 @@ struct SleepTimerButton: View {
     }
     
     
-    //    @ViewBuilder
     private func sleepButton(for duration: TimeInterval, label: String) -> some View {
         Button(action: {
             sleepTManager.startSleepTimer(for: duration)
