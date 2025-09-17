@@ -20,7 +20,7 @@ It supports **online and offline playback**, a clean modern UI, and essential au
 ## 📸 Screenshots
 | Dark Mode | Light Mode | Detail View |
 |-------------|-------------|----------------|
-| | ![Dark](screenshots/dark.png) | ![Light](screenshots/light.png) | ![Detail](screenshots/detail.png) |
+| | ![Dark](Screenshots/dark.jpg) | ![Light](Screenshots/light.jpg) | ![Detail](Screenshots/detail.jpg) |
 
 ---
 
