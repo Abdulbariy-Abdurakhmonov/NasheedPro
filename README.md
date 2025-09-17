@@ -20,7 +20,7 @@ It supports **online and offline playback**, a clean modern UI, and essential au
 ## 📸 Screenshots
 | Dark Mode | Light Mode | Detail View |
 |-----------|------------|-------------|
-| ![Dark](NasheedPro/Screenshots/dark.jpg) | ![Light](/Screenshots/light.jpg) | ![Detail](detail.jpg) |
+| ![Dark](NasheedPro/Screenshots/dark.jpg) | ![Light](NasheedPro/Screenshots/light.jpg) | ![Detail](NasheedPro/Screenshotsdetail.jpg) |
 
 ---
 
