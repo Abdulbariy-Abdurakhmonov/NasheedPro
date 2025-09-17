@@ -20,7 +20,7 @@ It supports **online and offline playback**, a clean modern UI, and essential au
 ## 📸 Screenshots
 | Dark Mode | Light Mode | Detail View |
 |-------------|-------------|----------------|
-| ![Dark mode](![dark](https://github.com/user-attachments/assets/19d80079-7f3b-4cf5-8e4b-17b5a2888836)) | ![Light mood](![light](https://github.com/user-attachments/assets/d2513ce3-07d0-46a8-835c-01e72ea7be46)) | ![Detail view](![detail](https://github.com/user-attachments/assets/cf217fa1-ed95-4cc6-8c9c-6e4c5cfd3fa0)) |
+| ![Dark mode](![dark](https://github.com/user-attachments/assets/19d80079-7f3b-4cf5-8e4b-17b5a2888836)) | ![Light mood](![light](https://github.com/user-attachments/assets/d2513ce3-07d0-46a8-835c-01e72ea7be46)) | ![Detail view](file:///Users/abdulboriy/Desktop/detail.jpg) |
 
 ---
 
