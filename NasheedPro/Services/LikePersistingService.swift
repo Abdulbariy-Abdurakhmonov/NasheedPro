@@ -26,10 +26,6 @@ class LikePersistingService {
         }
     }
     
-    
-    
-    
-  
      func getLikedIds() {
         let request = NSFetchRequest<LikedEntity>(entityName: entityName)
         
